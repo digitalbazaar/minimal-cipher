@@ -1,3 +1,2 @@
-// Node.js TextDecoder/TextEncoder/URL
+// Node.js TextDecoder/TextEncoder
 export {TextDecoder, TextEncoder} from 'util';
-export {URL} from 'url';
