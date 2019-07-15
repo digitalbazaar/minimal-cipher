@@ -9,9 +9,13 @@ import * as fipsAlgorithm from './algorithms/fips.js';
 import * as recAlgorithm from './algorithms/recommended.js';
 
 const VERSIONS = ['recommended', 'fips'];
-const ALGORITHMS = {
-  [fipsAlgorithm.JWE_ENC]: fipsAlgorithm,
-  [recAlgorithm.JWE_ENC]: recAlgorithm
+const CIPHER_ALGORITHMS = {
+  [fipsAlgorithm.cipher.JWE_ENC]: fipsAlgorithm.cipher,
+  [recAlgorithm.cipher.JWE_ENC]: recAlgorithm.cipher
+};
+const KEY_AGREEMENT_ALGORITHMS = {
+  [fipsAlgorithm.keyAgreement.JWE_ALG]: fipsAlgorithm.keyAgreement,
+  [recAlgorithm.keyAgreement.JWE_ALG]: recAlgorithm.keyAgreement
 };
 
 export class Cipher {
@@ -35,7 +39,13 @@ export class Cipher {
       throw new Error(`Unsupported version "${version}".`);
     }
     this.version = version;
-    this.algorithm = version === 'fips' ? fipsAlgorithm : recAlgorithm;
+    if(version === 'fips') {
+      this.cipher = fipsAlgorithm.cipher;
+      this.keyAgreement = fipsAlgorithm.keyAgreement;
+    } else {
+      this.cipher = recAlgorithm.cipher;
+      this.keyAgreement = recAlgorithm.keyAgreement;
+    }
   }
 
   /**
@@ -48,30 +58,47 @@ export class Cipher {
    * wrap the CEK for them.
    *
    * @param {Uint8Array|String} data the data to encrypt.
-   * @param {Object} kek a key encryption key API with `id`, `wrapKey`, and
-   *   `unwrapKey`.
+   * @param {Object} [kek=undefined] a key encryption key API with `id`,
+   *   `wrapKey`, and `unwrapKey`.
+   * @param {function} [getKey=undefined] a function that returns a Promise
+   *   that resolves to a DH public key, given its key ID.
    * @param {Array} [recipients=[]] an array of recipients for the encrypted
    *   content.
    * @param {String} [wrappedCek] a base64url-encoded CEK.
    *
    * @return {Promise<Object>} resolves to a JWE.
    */
-  async encrypt({data, kek, recipients = []}) {
+  async encrypt({data, kek, getKey, recipients = []}) {
+    // TODO: remove `kek` entirely
+    // TODO: do we want to call `getKey` `keyResolver` instead?
     if(!Array.isArray(recipients)) {
       throw new TypeError('"recipients" must be an array.');
     }
+    if(kek) {
+      if(typeof kek !== 'object') {
+        throw new TypeError('"kek" must be an object.');
+      }
+      if(recipients.length > 1) {
+        throw new Error(
+          'Encrypting for multiple recipients is only supported when every ' +
+          'recipient uses a key agreement key.');
+      }
+    } else if(recipients.length === 0) {
+      throw new Error('"kek" must be given when "recipients" is empty.');
+    } else {
+      // ensure all recipients use a supported key agreement algorithm
+      const {keyAgreement: {JWE_ALG: alg}} = this;
+      if(recipients.some(e => !e.header || e.header.alg !== alg)) {
+        throw new Error(`All recipients must use the algorithm "${alg}".`);
+      }
+    }
     data = _strToUint8Array(data);
-    const {algorithm} = this;
+    const {cipher} = this;
 
     // create new recipient or find existing one that matches KEK
     let recipient;
     recipients = recipients.slice();
     if(recipients.length === 0) {
-      // TODO: need to support passing a keyAgreement key instead ... which
-      // would have an API that would generate the kek -- but it would be
-      // the key agreement ID and algorithm (and an ephemeral DH key via `epk`)
-      // that would be included here, not the kek information
-
       // kek not added to recipients yet, copy recipients and add it
       recipient = {
         header: {
@@ -80,41 +107,46 @@ export class Cipher {
         }
       };
       recipients.push(recipient);
-    } else {
+    } else if(kek) {
       // find matching kek in `recipients`
       recipient = _findRecipient(recipients, kek);
       if(!recipient) {
-        throw new Error('KEK not found in "recipients".');
+        throw new Error('"kek" not found in "recipients".');
       }
     }
 
-    // if no encrypted key is present, generate a new CEK and wrap it
-    let cek;
-    if(!recipient.encrypted_key) {
-      // TODO: allow key wrapping for other recipients if they all use
-      // `ECDH-ES+A256KW` instead of simply rejecting outright
-      if(recipients.length > 1) {
-        throw new Error(
-          'Wrapping a new CEK for other recipients is not implemented.');
-      }
-      cek = await algorithm.generateKey();
+    // generate a CEK for encrypting the content
+    const cek = await cipher.generateKey();
+
+    if(kek) {
+      // wrap cek for single recipient using KEK
       recipient.encrypted_key = await kek.wrapKey({unwrappedKey: cek});
-      // TODO: wrap CEK for all other recipients
     } else {
-      // unwrap CEK for use below
-      cek = await kek.unwrapKey({wrappedKey: recipient.encrypted_key});
+      // fetch all public DH keys
+      const publicKeys = await Promise.all(
+        recipients.map(e => getKey({id: e.header.kid})));
+
+      // wrap cek for each recipient by deriving shared keys
+      const {keyAgreement} = this;
+      const derivedKeys = await Promise.all(
+        publicKeys.map(
+          peerPublicKey => keyAgreement.kekFromStaticPeer({peerPublicKey})));
+
+      // TODO: convert derived keys into JOSE header format `epk`, etc.
+
+      throw new Error('Not implemented.');
     }
 
     // create shared protected header as associated authenticated data (aad)
     // ASCII(BASE64URL(UTF8(JWE Protected Header)))
-    const enc = algorithm.JWE_ENC;
+    const enc = cipher.JWE_ENC;
     const jweProtectedHeader = JSON.stringify({enc});
     const _protected = base64url.encode(_strToUint8Array(jweProtectedHeader));
     // UTF8-encoding a base64url-encoded string is the same as ASCII
     const additionalData = _strToUint8Array(_protected);
 
     // encrypt data
-    const {ciphertext, iv, tag} = await algorithm.encrypt(
+    const {ciphertext, iv, tag} = await cipher.encrypt(
       {data, additionalData, cek});
 
     // represent encrypted data as JWE
@@ -151,16 +183,15 @@ export class Cipher {
    * encryption key KEK.
    *
    * @param {Object} jwe the JWE to decrypt.
-   * @param {Object} kek a key encryption key API with `id`, `wrap`, and
-   *   `unwrap`.
+   * @param {Object} [kek=undefined] a key encryption key API with `id`,
+   *   `wrap`, and `unwrap`.
+   * @param {Object} [keyAgreementKey=undefined] a key agreement key API with
+   *   `id` and `deriveSecret`.
    *
    * @return {Promise<Uint8Array|null>} resolves to the decrypted data or
    *   `null` if the decryption failed.
    */
-  async decrypt({jwe, kek}) {
-    // TODO: need to support the case where a keyAgreement key API is passed
-    // instead of a `kek` -- and the kek is generated internally via that API
-
+  async decrypt({jwe, kek, keyAgreementKey}) {
     // validate JWE
     if(!(jwe && typeof jwe === 'object')) {
       throw new TypeError('"jwe" must be an object.');
@@ -192,18 +223,27 @@ export class Cipher {
     if(!(header.enc && typeof header.enc === 'string')) {
       throw new Error('Invalid JWE "enc" header.');
     }
-    const algorithm = ALGORITHMS[header.enc];
-    if(!algorithm) {
+    const cipher = CIPHER_ALGORITHMS[header.enc];
+    if(!cipher) {
       throw new Error('Unsupported encryption algorithm "${header.enc}".');
     }
-
-    // find wrapped key for kekId
     if(!Array.isArray(jwe.recipients)) {
       throw new TypeError('"jwe.recipients" must be an array.');
     }
-    const recipient = _findRecipient(jwe.recipients, kek);
-    if(!recipient) {
-      throw new Error('No matching recipient found for KEK.');
+
+    // find wrapped key for `kek` or `keyAgreementKey`
+    let recipient;
+    if(kek) {
+      recipient = _findRecipient(jwe.recipients, kek);
+      if(!recipient) {
+        throw new Error('No matching recipient found for KEK.');
+      }
+    } else {
+      recipient = _findRecipient(jwe.recipients, keyAgreementKey);
+      if(!recipient) {
+        throw new Error('No matching recipient found for key agreement key.');
+      }
+      // TODO: generate `kek` API instance from key agreement key
     }
     const {encrypted_key: wrappedKey} = recipient;
 
@@ -214,7 +254,7 @@ export class Cipher {
     // unwrap CEK and decrypt content
     const cek = await kek.unwrapKey({wrappedKey});
     const {ciphertext, iv, tag} = jwe;
-    return algorithm.decrypt({
+    return cipher.decrypt({
       ciphertext: base64url.decode(ciphertext),
       iv: base64url.decode(iv),
       tag: base64url.decode(tag),
@@ -228,13 +268,16 @@ export class Cipher {
    * call `decrypt` and then `JSON.parse` the resulting decrypted UTF-8 data.
    *
    * @param {Object} jwe the JWE to decrypt.
-   * @param {String} kek the KEK API to use to decrypt.
+   * @param {Object} [kek=undefined] a key encryption key API with `id`,
+   *   `wrap`, and `unwrap`.
+   * @param {Object} [keyAgreementKey=undefined] a key agreement key API with
+   *   `id` and `deriveSecret`.
    *
    * @return {Promise<Object|null>} resolves to the decrypted object or `null`
    *   if the decryption failed.
    */
-  async decryptObject({jwe, kek}) {
-    const data = await this.decrypt({jwe, kek});
+  async decryptObject({jwe, kek, keyAgreementKey}) {
+    const data = await this.decrypt({jwe, kek, keyAgreementKey});
     if(!data) {
       // decryption failed
       return null;
@@ -243,9 +286,10 @@ export class Cipher {
   }
 }
 
-function _findRecipient(recipients, kek) {
+function _findRecipient(recipients, key) {
   return recipients.find(
-    e => e.header && e.header.kid === kek.id && e.header.alg === kek.algorithm);
+    e => e.header && e.header.kid === key.id &&
+    (!key.algorithm || (e.header.alg === key.algorithm)));
 }
 
 function _strToUint8Array(data) {

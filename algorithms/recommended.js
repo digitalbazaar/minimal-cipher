@@ -3,4 +3,8 @@
  */
 'use strict';
 
-export * from './c20p.js';
+import * as cipher from './c20p.js';
+import * as keyAgreement from './x25519.js';
+
+export {cipher};
+export {keyAgreement};

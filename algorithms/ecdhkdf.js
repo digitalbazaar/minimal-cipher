@@ -40,14 +40,14 @@ const KEY_LENGTH = 256;
  * @return {Promise<Uint8Array>} resolves to the generated key.
  */
 export async function deriveKey({secret, producerInfo, consumerInfo}) {
-  if(!(secret instanceof Uint8Array)) {
-    throw new TypeError('"secret" must be a Uint8Array.');
+  if(!(secret instanceof Uint8Array && secret.length > 0)) {
+    throw new TypeError('"secret" must be a non-empty Uint8Array.');
   }
-  if(!(producerInfo instanceof Uint8Array)) {
-    throw new TypeError('"secret" must be a Uint8Array.');
+  if(!(producerInfo instanceof Uint8Array && producerInfo.length > 0)) {
+    throw new TypeError('"producerInfo" must be a non-empty Uint8Array.');
   }
-  if(!(consumerInfo instanceof Uint8Array)) {
-    throw new TypeError('"secret" must be a Uint8Array.');
+  if(!(consumerInfo instanceof Uint8Array && consumerInfo.length > 0)) {
+    throw new TypeError('"consumerInfo" must be a non-empty Uint8Array.');
   }
 
   // the output of Concat KDF is hash(roundNumber || Z || OtherInfo)
