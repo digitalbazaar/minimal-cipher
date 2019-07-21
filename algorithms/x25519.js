@@ -12,7 +12,7 @@ import {TextEncoder} from '../util.js';
 
 const KEY_TYPE = 'X25519KeyAgreementKey2019';
 
-export const JWE_ENC = 'ECDH-ES+A256KW';
+export const JWE_ALG = 'ECDH-ES+A256KW';
 
 export async function deriveEphemeralKeyPair() {
   // generate X25519 ephemeral public key

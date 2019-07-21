@@ -14,6 +14,9 @@ const CIPHER_ALGORITHMS = {
   [recAlgorithm.cipher.JWE_ENC]: recAlgorithm.cipher
 };
 
+// only supported key algorithm
+const KEY_ALGORITHM = 'ECDH-ES+A256KW';
+
 export class Cipher {
   /**
    * Creates a new Cipher instance that can be used to encrypt or decrypt
@@ -68,7 +71,7 @@ export class Cipher {
     // ensure all recipients use the supported key agreement algorithm
     const {keyAgreement} = this;
     const {JWE_ALG: alg} = keyAgreement;
-    if(recipients.some(e => !e.header || e.header.alg !== alg)) {
+    if(!recipients.every(e => e.header && e.header.alg === alg)) {
       throw new Error(`All recipients must use the algorithm "${alg}".`);
     }
     data = _strToUint8Array(data);
@@ -246,7 +249,7 @@ export class Cipher {
 function _findRecipient(recipients, key) {
   return recipients.find(
     e => e.header && e.header.kid === key.id &&
-    (!key.algorithm || (e.header.alg === key.algorithm)));
+    (!key.algorithm && e.header.alg === KEY_ALGORITHM));
 }
 
 function _strToUint8Array(data) {
