@@ -68,17 +68,16 @@ export async function deriveKey({secret, producerInfo, consumerInfo}) {
     4 + producerInfo.length + // PartyUInfo
     4 + consumerInfo.length + // PartyVInfo
     4); // SuppPubInfo (key data length in bits)
-
   let offset = 0;
   const dv = new DataView(input.buffer, input.byteOffset, input.byteLength);
-  dv.setUint32(0, 1);
+  dv.setUint32(offset, 1);
   input.set(secret, offset += 4);
   input.set(ALGORITHM_ID, offset += secret.length);
-  dv.setUint32(producerInfo.length, offset += ALGORITHM_ID.length);
-  input.set(producerInfo.length, offset += 4);
-  dv.setUint32(consumerInfo.length, offset += producerInfo.length);
-  input.set(consumerInfo.length, offset += 4);
-  input.set(KEY_LENGTH, offset += 4);
+  dv.setUint32(offset += ALGORITHM_ID.length, producerInfo.length);
+  input.set(producerInfo, offset += 4);
+  dv.setUint32(offset += producerInfo.length, consumerInfo.length);
+  input.set(consumerInfo, offset += 4);
+  dv.setUint32(offset += consumerInfo.length, KEY_LENGTH);
 
   // hash input and return result as derived key
   return new Uint8Array(

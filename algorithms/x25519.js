@@ -61,7 +61,7 @@ export async function kekFromEphemeralPeer({keyAgreementKey, epk}) {
     {publicKey: ephemeralPublicKey});
   const keyData = await deriveKey({secret, producerInfo, consumerInfo});
   return {
-    kek: createKek({keyData})
+    kek: await createKek({keyData})
   };
 }
 
@@ -71,7 +71,7 @@ export async function kekFromStaticPeer({ephemeralKeyPair, staticPublicKey}) {
   if(!ephemeralKeyPair) {
     ephemeralKeyPair = await deriveEphemeralKeyPair();
   }
-  const {secretKey: privateKey} = ephemeralKeyPair;
+  const {privateKey} = ephemeralKeyPair;
   // TODO: consider accepting JWK format for `staticPublicKey` not just LD key
   if(staticPublicKey.type !== KEY_TYPE) {
     throw new Error(
@@ -87,7 +87,7 @@ export async function kekFromStaticPeer({ephemeralKeyPair, staticPublicKey}) {
   const secret = await deriveSecret({privateKey, remotePublicKey});
   const keyData = await deriveKey({secret, producerInfo, consumerInfo});
   return {
-    kek: createKek({keyData}),
+    kek: await createKek({keyData}),
     epk: ephemeralKeyPair.epk,
     apu: base64url.encode(producerInfo),
     apv: base64url.encode(consumerInfo),
