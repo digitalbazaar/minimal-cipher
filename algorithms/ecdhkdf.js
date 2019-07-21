@@ -13,8 +13,12 @@ const KEY_ALGORITHM = 'ECDH-ES+A256KW';
 const ALGORITHM_CONTENT = new TextEncoder().encode(KEY_ALGORITHM);
 const ALGORITHM_ID = new Uint8Array(4 + ALGORITHM_CONTENT.length);
 // write length of content as 32-bite big endian integer, then write content
-ALGORITHM_ID.setUint32(0, ALGORITHM_CONTENT.length);
-ALGORITHM_ID.set(4, ALGORITHM_CONTENT);
+const dv = new DataView(
+  ALGORITHM_ID.buffer,
+  ALGORITHM_ID.byteOffset,
+  ALGORITHM_ID.byteLength);
+dv.setUint32(0, ALGORITHM_CONTENT.length);
+ALGORITHM_ID.set(ALGORITHM_CONTENT, 4);
 
 // RFC 7518 Section 4.6.2 specifies using SHA-256 for ECDH-ES KDF
 // https://tools.ietf.org/html/rfc7518#section-4.6.2
@@ -66,14 +70,15 @@ export async function deriveKey({secret, producerInfo, consumerInfo}) {
     4); // SuppPubInfo (key data length in bits)
 
   let offset = 0;
-  input.setUint32(0, 1);
-  input.set(offset += 4, secret);
-  input.set(offset += secret.length, ALGORITHM_ID);
-  input.setUint32(offset += ALGORITHM_ID.length, producerInfo.length);
-  input.set(offset += 4, producerInfo.length);
-  input.setUint32(offset += producerInfo.length, consumerInfo.length);
-  input.set(offset += 4, consumerInfo.length);
-  input.set(offset += 4, KEY_LENGTH);
+  const dv = new DataView(input.buffer, input.byteOffset, input.byteLength);
+  dv.setUint32(0, 1);
+  input.set(secret, offset += 4);
+  input.set(ALGORITHM_ID, offset += secret.length);
+  dv.setUint32(producerInfo.length, offset += ALGORITHM_ID.length);
+  input.set(producerInfo.length, offset += 4);
+  dv.setUint32(consumerInfo.length, offset += producerInfo.length);
+  input.set(consumerInfo.length, offset += 4);
+  input.set(KEY_LENGTH, offset += 4);
 
   // hash input and return result as derived key
   return new Uint8Array(
