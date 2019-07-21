@@ -210,9 +210,14 @@ export class Cipher {
 
     // derive KEK and unwrap CEK
     const {epk} = recipient.header;
-    const {kek} = await keyAgreementKey.kekFromEphemeralPeer(
+    const {keyAgreement} = this;
+    const {kek} = await keyAgreement.kekFromEphemeralPeer(
       {keyAgreementKey, epk});
     const cek = await kek.unwrapKey({wrappedKey});
+    if(!cek) {
+      // failed to unwrap key
+      return null;
+    }
 
     // decrypt content
     const {ciphertext, iv, tag} = jwe;

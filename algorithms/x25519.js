@@ -35,10 +35,10 @@ export async function kekFromEphemeralPeer({keyAgreementKey, epk}) {
   if(!(epk && typeof epk === 'object')) {
     throw new TypeError('"epk" must be an object.');
   }
-  if(typeof epk.ktp !== 'OKP') {
-    throw new Error('"epk.ktp" must be the string "OKP".');
+  if(epk.kty !== 'OKP') {
+    throw new Error('"epk.kty" must be the string "OKP".');
   }
-  if(typeof epk.crv !== 'X25519') {
+  if(epk.crv !== 'X25519') {
     throw new Error('"epk.crv" must be the string "X25519".');
   }
   // decode public key material
@@ -68,9 +68,6 @@ export async function kekFromEphemeralPeer({keyAgreementKey, epk}) {
 // Encryption case: get Kek *and* ephemeral DH key from a peer's public
 // static key
 export async function kekFromStaticPeer({ephemeralKeyPair, staticPublicKey}) {
-  if(!ephemeralKeyPair) {
-    ephemeralKeyPair = await deriveEphemeralKeyPair();
-  }
   const {privateKey} = ephemeralKeyPair;
   // TODO: consider accepting JWK format for `staticPublicKey` not just LD key
   if(staticPublicKey.type !== KEY_TYPE) {
@@ -81,7 +78,7 @@ export async function kekFromStaticPeer({ephemeralKeyPair, staticPublicKey}) {
 
   const encoder = new TextEncoder();
   // "Party U Info"
-  const producerInfo = remotePublicKey;
+  const producerInfo = ephemeralKeyPair.publicKey;
   // "Party V Info"
   const consumerInfo = encoder.encode(staticPublicKey.id);
   const secret = await deriveSecret({privateKey, remotePublicKey});
@@ -96,6 +93,6 @@ export async function kekFromStaticPeer({ephemeralKeyPair, staticPublicKey}) {
 }
 
 async function deriveSecret({privateKey, remotePublicKey}) {
-  // `scalarMult` takes publicKey as param 1, secret key as param 2
-  return nacl.scalarMult(remotePublicKey, privateKey);
+  // `scalarMult` takes secret key as param 1, public key as param 2
+  return nacl.scalarMult(privateKey, remotePublicKey);
 }

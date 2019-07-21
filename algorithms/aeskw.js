@@ -40,18 +40,24 @@ class Kek {
    * @param {string} options.wrappedKey - The wrapped key material as a
    *   base64url-encoded string.
    *
-   * @returns {Promise<Uint8Array>} The key bytes.
+   * @returns {Promise<Uint8Array|null>} Resolves to the key bytes or null if
+   *   the unwrapping fails because the key does not match.
    */
   async unwrapKey({wrappedKey}) {
     const kek = this.key;
     // Note: `AES-GCM` algorithm name doesn't matter; will be exported raw.
     wrappedKey = base64url.decode(wrappedKey);
-    const extractable = true;
-    const key = await crypto.subtle.unwrapKey(
-      'raw', wrappedKey, kek, kek.algorithm,
-      {name: 'AES-GCM'}, extractable, ['encrypt']);
-    const keyBytes = await crypto.subtle.exportKey('raw', key);
-    return new Uint8Array(keyBytes);
+    try {
+      const extractable = true;
+      const key = await crypto.subtle.unwrapKey(
+        'raw', wrappedKey, kek, kek.algorithm,
+        {name: 'AES-GCM'}, extractable, ['encrypt']);
+      const keyBytes = await crypto.subtle.exportKey('raw', key);
+      return new Uint8Array(keyBytes);
+    } catch(e) {
+      // decryption failed
+      return null;
+    }
   }
 }
 
