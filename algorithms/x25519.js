@@ -10,6 +10,8 @@ import {deriveKey} from './ecdhkdf.js';
 import nacl from 'tweetnacl';
 import {TextEncoder} from '../util.js';
 
+const KEY_TYPE = 'X25519KeyAgreementKey2019';
+
 export const JWE_ENC = 'ECDH-ES+A256KW';
 
 export async function deriveEphemeralKeyPair() {
@@ -34,17 +36,17 @@ export async function kekFromEphemeralPeer({keyAgreementKey, epk}) {
     throw new TypeError('"epk" must be an object.');
   }
   if(typeof epk.ktp !== 'OKP') {
-    throw new TypeError('"epk.ktp" must be the string "OKP".');
+    throw new Error('"epk.ktp" must be the string "OKP".');
   }
   if(typeof epk.crv !== 'X25519') {
-    throw new TypeError('"epk.crv" must be the string "X25519".');
+    throw new Error('"epk.crv" must be the string "X25519".');
   }
   // decode public key material
   const publicKey = base64url.decode(epk.x);
 
   // convert to LD key for Web KMS
   const ephemeralPublicKey = {
-    type: 'X25519KeyAgreementKey2019',
+    type: KEY_TYPE,
     publicKeyBase58: base58.encode(publicKey)
   };
 
@@ -70,6 +72,11 @@ export async function kekFromStaticPeer({ephemeralKeyPair, staticPublicKey}) {
     ephemeralKeyPair = await deriveEphemeralKeyPair();
   }
   const {secretKey: privateKey} = ephemeralKeyPair;
+  // TODO: consider accepting JWK format for `staticPublicKey` not just LD key
+  if(staticPublicKey.type !== KEY_TYPE) {
+    throw new Error(
+      `"staticPublicKey.type" must be "${KEY_TYPE}".`);
+  }
   const remotePublicKey = base58.decode(staticPublicKey.publicKeyBase58);
 
   const encoder = new TextEncoder();

@@ -54,14 +54,14 @@ export class Cipher {
    * ephemeral ECDH key.
    *
    * @param {Uint8Array|String} data the data to encrypt.
-   * @param {function} keyResolver a function that returns a Promise
-   *   that resolves a key ID to a DH public key.
    * @param {Array} recipients an array of recipients for the encrypted
    *   content.
+   * @param {function} keyResolver a function that returns a Promise
+   *   that resolves a key ID to a DH public key.
    *
    * @return {Promise<Object>} resolves to a JWE.
    */
-  async encrypt({data, keyResolver, recipients}) {
+  async encrypt({data, recipients, keyResolver}) {
     if(!(Array.isArray(recipients) && recipients.length > 0)) {
       throw new TypeError('"recipients" must be a non-empty array.');
     }
