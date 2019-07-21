@@ -13,5 +13,5 @@ export function encode(input, maxline) {
 }
 
 export function decode(input) {
-  return _decode(input);
+  return _decode(input, alphabet);
 }
