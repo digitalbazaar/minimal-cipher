@@ -261,9 +261,7 @@ export class Cipher {
 
     // encrypt stream
     if(data === undefined) {
-      return new TransformStream(new EncryptTransformer({
-        cipher, recipients, encodedProtectedHeader, cek, additionalData
-      }));
+      return new TransformStream(transformer);
     }
 
     // encrypt data

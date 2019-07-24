@@ -54,7 +54,7 @@ export class EncryptTransformer {
 
       // flush if buffer is full and more data remains
       if(chunk) {
-        this.flush(controller);
+        await this.flush(controller);
       }
     }
   }
