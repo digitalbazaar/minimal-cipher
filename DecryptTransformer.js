@@ -92,6 +92,9 @@ export class DecryptTransformer {
       throw new Error('Invalid or missing "encrypted_key".');
     }
 
+    // TODO: consider a cache of encrypted_key => CEKs to reduce unwrapping
+    // calls which may even need to hit the network (e.g., Web KMS)
+
     // derive KEK and unwrap CEK
     const {epk} = recipient.header;
     const {keyAgreement} = this;
