@@ -14,6 +14,8 @@
   },
   "files": [
     "Cipher.js",
+    "DecryptTransformer.js",
+    "EncryptTransformer.js",
     "algorithms/*.js",
     "baseN.js",
     "base58.js",
@@ -30,7 +32,8 @@
     "base64url-universal": "^1.0.0",
     "esm": "^3.2.22",
     "isomorphic-webcrypto": "^1.6.1",
-    "tweetnacl": "^1.0.1"
+    "tweetnacl": "^1.0.1",
+    "web-streams-polyfill": "^2.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.4.3",

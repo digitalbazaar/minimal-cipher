@@ -4,18 +4,13 @@
 'use strict';
 
 import base64url from 'base64url-universal';
-import {TextDecoder, TextEncoder} from './util.js';
+import {TextDecoder, stringToUint8Array} from './util.js';
+import {DecryptTransformer} from './DecryptTransformer.js';
+import {EncryptTransformer} from './EncryptTransformer.js';
 import * as fipsAlgorithm from './algorithms/fips.js';
 import * as recAlgorithm from './algorithms/recommended.js';
 
 const VERSIONS = ['recommended', 'fips'];
-const CIPHER_ALGORITHMS = {
-  [fipsAlgorithm.cipher.JWE_ENC]: fipsAlgorithm.cipher,
-  [recAlgorithm.cipher.JWE_ENC]: recAlgorithm.cipher
-};
-
-// only supported key algorithm
-const KEY_ALGORITHM = 'ECDH-ES+A256KW';
 
 export class Cipher {
   /**
@@ -74,7 +69,7 @@ export class Cipher {
     if(!recipients.every(e => e.header && e.header.alg === alg)) {
       throw new Error(`All recipients must use the algorithm "${alg}".`);
     }
-    data = _strToUint8Array(data);
+    data = stringToUint8Array(data);
     const {cipher} = this;
 
     // generate a CEK for encrypting the content
@@ -106,23 +101,20 @@ export class Cipher {
     // ASCII(BASE64URL(UTF8(JWE Protected Header)))
     const enc = cipher.JWE_ENC;
     const jweProtectedHeader = JSON.stringify({enc});
-    const _protected = base64url.encode(_strToUint8Array(jweProtectedHeader));
+    const encodedProtectedHeader =
+      base64url.encode(stringToUint8Array(jweProtectedHeader));
     // UTF8-encoding a base64url-encoded string is the same as ASCII
-    const additionalData = _strToUint8Array(_protected);
+    const additionalData = stringToUint8Array(encodedProtectedHeader);
 
     // encrypt data
-    const {ciphertext, iv, tag} = await cipher.encrypt(
-      {data, additionalData, cek});
-
-    // represent encrypted data as JWE
-    const jwe = {
-      protected: _protected,
+    const transformer = new EncryptTransformer({
       recipients,
-      iv: base64url.encode(iv),
-      ciphertext: base64url.encode(ciphertext),
-      tag: base64url.encode(tag)
-    };
-    return jwe;
+      encodedProtectedHeader,
+      cipher,
+      additionalData,
+      cek
+    });
+    return transformer.encrypt(data);
   }
 
   /**
@@ -158,76 +150,11 @@ export class Cipher {
    *   `null` if the decryption failed.
    */
   async decrypt({jwe, keyAgreementKey}) {
-    // validate JWE
-    if(!(jwe && typeof jwe === 'object')) {
-      throw new TypeError('"jwe" must be an object.');
-    }
-    if(typeof jwe.protected !== 'string') {
-      throw new TypeError('"jwe.protected" is missing or not a string.');
-    }
-    if(typeof jwe.iv !== 'string') {
-      throw new Error('Invalid or missing "iv".');
-    }
-    if(typeof jwe.ciphertext !== 'string') {
-      throw new Error('Invalid or missing "ciphertext".');
-    }
-    if(typeof jwe.tag !== 'string') {
-      throw new Error('Invalid or missing "tag".');
-    }
-
-    // validate encryption header
-    let header;
-    let additionalData;
-    try {
-      // ASCII(BASE64URL(UTF8(JWE Protected Header)))
-      additionalData = _strToUint8Array(jwe.protected);
-      header = JSON.parse(new TextDecoder().decode(
-        base64url.decode(jwe.protected)));
-    } catch(e) {
-      throw new Error('Invalid JWE "protected" header.');
-    }
-    if(!(header.enc && typeof header.enc === 'string')) {
-      throw new Error('Invalid JWE "enc" header.');
-    }
-    const cipher = CIPHER_ALGORITHMS[header.enc];
-    if(!cipher) {
-      throw new Error('Unsupported encryption algorithm "${header.enc}".');
-    }
-    if(!Array.isArray(jwe.recipients)) {
-      throw new TypeError('"jwe.recipients" must be an array.');
-    }
-
-    // find `keyAgreementKey` matching recipient
-    const recipient = _findRecipient(jwe.recipients, keyAgreementKey);
-    if(!recipient) {
-      throw new Error('No matching recipient found for key agreement key.');
-    }
-    // get wrapped CEK
-    const {encrypted_key: wrappedKey} = recipient;
-    if(typeof wrappedKey !== 'string') {
-      throw new Error('Invalid or missing "encrypted_key".');
-    }
-
-    // derive KEK and unwrap CEK
-    const {epk} = recipient.header;
-    const {keyAgreement} = this;
-    const {kek} = await keyAgreement.kekFromEphemeralPeer(
-      {keyAgreementKey, epk});
-    const cek = await kek.unwrapKey({wrappedKey});
-    if(!cek) {
-      // failed to unwrap key
-      return null;
-    }
-
-    // decrypt content
-    const {ciphertext, iv, tag} = jwe;
-    return cipher.decrypt({
-      ciphertext: base64url.decode(ciphertext),
-      iv: base64url.decode(iv),
-      tag: base64url.decode(tag),
-      additionalData,
-      cek
+    const transformer = new DecryptTransformer({
+      keyAgreement: this.keyAgreement,
+      keyAgreementKey
     });
+    return transformer.decrypt(jwe);
   }
 
   /**
@@ -249,21 +176,4 @@ export class Cipher {
     }
     return JSON.parse(new TextDecoder().decode(data));
   }
-}
-
-function _findRecipient(recipients, key) {
-  return recipients.find(
-    e => e.header && e.header.kid === key.id &&
-    (!key.algorithm && e.header.alg === KEY_ALGORITHM));
-}
-
-function _strToUint8Array(data) {
-  if(typeof data === 'string') {
-    // convert data to Uint8Array
-    return new TextEncoder().encode(data);
-  }
-  if(!(data instanceof Uint8Array)) {
-    throw new TypeError('"data" be a string or Uint8Array.');
-  }
-  return data;
 }
