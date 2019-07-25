@@ -63,7 +63,9 @@ export class Cipher {
    * @return {Promise<TransformStream>} resolves to a TransformStream.
    */
   async createEncryptStream({recipients, keyResolver, chunkSize}) {
-    return this._encrypt({recipients, keyResolver, chunkSize});
+    const transformer = await this.createEncryptTransformer(
+      {recipients, keyResolver, chunkSize});
+    return new TransformStream(transformer);
   }
 
   /**
@@ -85,10 +87,9 @@ export class Cipher {
    * @return {Promise<TransformStream>} resolves to the TransformStream.
    */
   async createDecryptStream({keyAgreementKey}) {
-    return new TransformStream(new DecryptTransformer({
-      keyAgreement: this.keyAgreement,
-      keyAgreementKey
-    }));
+    const transformer = await this.createDecryptTransformer(
+      {keyAgreementKey});
+    return new TransformStream(transformer);
   }
 
   /**
@@ -113,7 +114,12 @@ export class Cipher {
     if(typeof data !== Uint8Array && typeof data !== 'string') {
       throw new TypeError('"data" must be a Uint8Array or a string.');
     }
-    return this._encrypt({data, recipients, keyResolver});
+    if(data) {
+      data = stringToUint8Array(data);
+    }
+    const transformer = await this.createEncryptTransformer(
+      {recipients, keyResolver});
+    return transformer.encrypt(data);
   }
 
   /**
@@ -149,10 +155,8 @@ export class Cipher {
    *   or `null` if the decryption failed.
    */
   async decrypt({jwe, keyAgreementKey}) {
-    const transformer = new DecryptTransformer({
-      keyAgreement: this.keyAgreement,
-      keyAgreementKey
-    });
+    const transformer = await this.createDecryptTransformer(
+      {keyAgreementKey});
     return transformer.decrypt(jwe);
   }
 
@@ -177,12 +181,8 @@ export class Cipher {
   }
 
   /**
-   * Encrypts some data for one or more recipients and outputs a JWE. The
-   * data to encrypt can be given as a Uint8Array or a string, in which
-   * case a single JWE will be output. If no data is given, a TransformStream
-   * will be returned, from which one or more chunks that are objects that
-   * include a `jwe` property with a JWE may be read after sufficient chunks,
-   * in the form of Uint8Arrays, have been written to it.
+   * Creates an EncryptTransformer that can be used to encrypt one or more
+   * chunks of data.
    *
    * A list of recipients must be given in the `recipients` array, identified
    * by key agreement keys. An ephemeral ECDH key will be generated and used to
@@ -190,7 +190,6 @@ export class Cipher {
    * in the `recipients` array will be updated to include the generated
    * ephemeral ECDH key.
    *
-   * @param {Uint8Array|String} [data] the data to encrypt.
    * @param {Array} recipients an array of recipients for the encrypted
    *   content.
    * @param {function} keyResolver a function that returns a Promise
@@ -198,10 +197,9 @@ export class Cipher {
    * @param {number} [chunkSize=1048576] the size, in bytes, of the chunks to
    *   break the incoming data into (only applies if returning a stream).
    *
-   * @return {Promise<Object|TransformStream>} resolves to a JWE or a
-   *   TransformStream.
+   * @return {Promise<EncryptTransformer>} resolves to an EncryptTransformer.
    */
-  async _encrypt({data, recipients, keyResolver, chunkSize}) {
+  async createEncryptTransformer({recipients, keyResolver, chunkSize}) {
     if(!(Array.isArray(recipients) && recipients.length > 0)) {
       throw new TypeError('"recipients" must be a non-empty array.');
     }
@@ -210,9 +208,6 @@ export class Cipher {
     const {JWE_ALG: alg} = keyAgreement;
     if(!recipients.every(e => e.header && e.header.alg === alg)) {
       throw new Error(`All recipients must use the algorithm "${alg}".`);
-    }
-    if(data) {
-      data = stringToUint8Array(data);
     }
     const {cipher} = this;
 
@@ -250,7 +245,7 @@ export class Cipher {
     // UTF8-encoding a base64url-encoded string is the same as ASCII
     const additionalData = stringToUint8Array(encodedProtectedHeader);
 
-    const transformer = new EncryptTransformer({
+    return new EncryptTransformer({
       recipients,
       encodedProtectedHeader,
       cipher,
@@ -258,13 +253,20 @@ export class Cipher {
       cek,
       chunkSize
     });
+  }
 
-    // encrypt stream
-    if(data === undefined) {
-      return new TransformStream(transformer);
-    }
-
-    // encrypt data
-    return transformer.encrypt(data);
+  /**
+   * Creates a DecryptTransformer.
+   *
+   * @param {Object} keyAgreementKey a key agreement key API with `id` and
+   *   `deriveSecret`.
+   *
+   * @return {Promise<DecryptTransformer>} resolves to a DecryptTransformer.
+   */
+  async createDecryptTransformer({keyAgreementKey}) {
+    return new DecryptTransformer({
+      keyAgreement: this.keyAgreement,
+      keyAgreementKey
+    });
   }
 }
