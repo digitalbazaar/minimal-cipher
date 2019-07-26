@@ -230,6 +230,7 @@ export class Cipher {
     // update all recipients with ephemeral ECDH key and wrapped CEK
     await Promise.all(recipients.map(async (recipient, i) => {
       const {kek, epk, apu, apv} = derivedResults[i];
+      recipients[i] = recipient = {header: {...recipient.header}};
       recipient.header.epk = epk;
       recipient.header.apu = apu;
       recipient.header.apv = apv;
