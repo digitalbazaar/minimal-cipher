@@ -27,6 +27,9 @@ export class DecryptTransformer {
 
   async transform(chunk, controller) {
     // assumes `chunk` is an object with a JWE under the `jwe` property
+    if(!(chunk && typeof chunk === 'object')) {
+      throw new TypeError('"chunk" must be an object.');
+    }
     const {jwe} = chunk;
 
     const data = await this.decrypt(jwe);

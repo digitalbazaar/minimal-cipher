@@ -36,6 +36,9 @@ export class EncryptTransformer {
     const {buffer} = this;
 
     // assumes `chunk` is a Uint8Array...
+    if(!(chunk instanceof Uint8Array)) {
+      throw new TypeError('"chunk" must be an object.');
+    }
     while(chunk) {
       const space = buffer.length - this.offset;
       if(chunk.length <= space) {
