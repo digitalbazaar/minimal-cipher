@@ -4,8 +4,17 @@ const TextDecoder = self.TextDecoder;
 const TextEncoder = self.TextEncoder;
 export {TextDecoder, TextEncoder};
 
-const ReadableStream = self.ReadableStream;
-const TransformStream = self.TransformStream;
+let ReadableStream = self.ReadableStream;
+let TransformStream = self.TransformStream;
+// TODO: ensure this polyfill is necessary
+import {ReadableStream as Readable, TransformStream as Transform}
+  from 'web-streams-polyfill/ponyfill';
+if(!ReadableStream) {
+  ReadableStream = Readable;
+}
+if(!TransformStream) {
+  TransformStream = Transform;
+}
 export {ReadableStream, TransformStream};
 
 export function stringToUint8Array(data) {
