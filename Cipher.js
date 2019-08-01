@@ -111,7 +111,7 @@ export class Cipher {
    * @return {Promise<Object>} resolves to a JWE.
    */
   async encrypt({data, recipients, keyResolver}) {
-    if(typeof data !== Uint8Array && typeof data !== 'string') {
+    if(!(data instanceof Uint8Array) && typeof data !== 'string') {
       throw new TypeError('"data" must be a Uint8Array or a string.');
     }
     if(data) {
