@@ -43,6 +43,13 @@ describe('minimal-cipher should use ', function() {
         result.should.be.a.JWE;
       });
 
+      it('to encrypt a simple object', async function() {
+        const obj = {simple: true};
+        const result = await cipher.encryptObject(
+          {obj, recipients, keyResolver});
+        result.should.be.a.JWE;
+      });
+
       it.skip('to encrypt a stream', async function() {
 
       });
