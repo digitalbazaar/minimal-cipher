@@ -11,15 +11,16 @@ export const JWE_ENC = 'A256GCM';
  * Generates a content encryption key (CEK). The 256-bit key is intended to be
  * used as an AES-GCM key.
  *
- * @return {Promise<CryptoKey>} resolves to the generated key.
+ * @return {Promise<Uint8Array>} resolves to the generated key.
  */
 export async function generateKey() {
   // generate content encryption key
-  return crypto.subtle.generateKey(
+  const key = await crypto.subtle.generateKey(
     {name: 'AES-GCM', length: 256},
     // key must be extractable in order to be wrapped
     true,
     ['encrypt']);
+  return crypto.subtle.exportKey('raw', key);
 }
 
 /**
@@ -28,12 +29,12 @@ export async function generateKey() {
  *
  * @param {Uint8Array} data the data to encrypt.
  * @param {Uint8Array} additionalData optional additional authentication data.
- * @param {Uint8Array|CryptoKey} the content encryption key to use.
+ * @param {Uint8Array} the content encryption key to use.
  *
  * @return {Promise<Object>} resolves to `{ciphertext, iv, tag}`.
  */
 export async function encrypt({data, additionalData, cek}) {
-  cek = _importCek({cek, usages: ['encrypt']});
+  cek = await _importCek({cek, usages: ['encrypt']});
 
   // NIST Special Publication 800-38D 8.2.2 RGB Construction of IV allows for
   // 96-bit IVs to be randomly generated; should this recommendation change
@@ -65,7 +66,7 @@ export async function encrypt({data, additionalData, cek}) {
  * @param {Uint8Array} iv the initialization vector.
  * @param {Uint8Array} tag the authentication tag.
  * @param {Uint8Array} additionalData optional additional authentication data.
- * @param {Uint8Array|CryptoKey} cek the content encryption key to use.
+ * @param {Uint8Array} cek the content encryption key to use.
  *
  * @return {Promise<Uint8Array>} the decrypted data.
  */
@@ -80,23 +81,19 @@ export async function decrypt({ciphertext, iv, tag, additionalData, cek}) {
     throw new Error('Invalid or missing "tag".');
   }
 
-  cek = _importCek({cek, usages: ['decrypt']});
+  cek = await _importCek({cek, usages: ['decrypt']});
 
   // decrypt `ciphertext`
-  const tagLength = tag.length;
-  const encrypted = new Uint8Array(ciphertext.length + tagLength);
+  const encrypted = new Uint8Array(ciphertext.length + tag.length);
   encrypted.set(ciphertext);
   encrypted.set(tag, ciphertext.length);
+  const tagLength = tag.length * 8;
   const decrypted = new Uint8Array(await crypto.subtle.decrypt(
     {name: 'AES-GCM', iv, tagLength, additionalData}, cek, encrypted));
   return decrypted;
 }
 
-function _importCek({cek, usages}) {
-  if(cek instanceof CryptoKey) {
-    // already imported
-    return cek;
-  }
+async function _importCek({cek, usages}) {
   if(!(cek instanceof Uint8Array)) {
     throw new TypeError('"cek" must be a CryptoKey or Uint8Array.');
   }

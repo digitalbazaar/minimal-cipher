@@ -17,7 +17,7 @@ class Kek {
    *
    * @param {Object} options - The options to use.
    * @param {Uint8Array} options.unwrappedKey - The key material as a
-   *   Uint8Array.
+   *   `Uint8Array`.
    *
    * @returns {Promise<string>} The base64url-encoded wrapped key bytes.
    */
@@ -25,6 +25,7 @@ class Kek {
     const kek = this.key;
     // Note: `AES-GCM` algorithm name doesn't matter; will be exported raw.
     const extractable = true;
+
     unwrappedKey = await crypto.subtle.importKey(
       'raw', unwrappedKey, {name: 'AES-GCM', length: 256},
       extractable, ['encrypt']);
@@ -40,7 +41,7 @@ class Kek {
    * @param {string} options.wrappedKey - The wrapped key material as a
    *   base64url-encoded string.
    *
-   * @returns {Promise<Uint8Array|null>} Resolves to the key bytes or null if
+   * @returns {Promise<Uint8Array>} Resolves to the key bytes or null if
    *   the unwrapping fails because the key does not match.
    */
   async unwrapKey({wrappedKey}) {
