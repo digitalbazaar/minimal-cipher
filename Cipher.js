@@ -19,11 +19,11 @@ export class Cipher {
    * indicates whether a FIPS-compliant algorithm or the latest recommended
    * algorithm will be used.
    *
-   * @param {String} [version='recommended'] `fips` to use a FIPS-compliant
+   * @param {string} [version='recommended'] - `fips` to use a FIPS-compliant
    *   algorithm, `recommended` to use the latest recommended algorithm when
    *   encrypting.
    *
-   * @return {Cipher}.
+   * @returns {Cipher} A Cipher used to encrypt and decrypt data.
    */
   constructor({version = 'recommended'} = {}) {
     if(typeof version !== 'string') {
@@ -53,14 +53,15 @@ export class Cipher {
    * in the `recipients` array will be updated to include the generated
    * ephemeral ECDH key.
    *
-   * @param {Array} recipients an array of recipients for the encrypted
-   *   content.
-   * @param {function} keyResolver a function that returns a Promise
+   * @param {object} options - The options for the stream.
+   * @param {Array} options.recipients
+   * - An array of recipients for the encrypted content.
+   * @param {Function} options.keyResolver - A function that returns a Promise
    *   that resolves a key ID to a DH public key.
-   * @param {number} [chunkSize=1048576] the size, in bytes, of the chunks to
-   *   break the incoming data into.
+   * @param {number} [options.chunkSize=1048576]
+   * - The size, in bytes, of the chunks to break the incoming data into.
    *
-   * @return {Promise<TransformStream>} resolves to a TransformStream.
+   * @returns {Promise<TransformStream>} Resolves to a TransformStream.
    */
   async createEncryptStream({recipients, keyResolver, chunkSize}) {
     const transformer = await this.createEncryptTransformer(
@@ -81,10 +82,11 @@ export class Cipher {
    * (KEK) generated via a shared secret between an ephemeral ECDH key and a
    * static ECDH key (ECDH-ES).
    *
-   * @param {Object} keyAgreementKey a key agreement key API with `id` and
-   *   `deriveSecret`.
+   * @param {object} options - Options for createDecryptStream.
+   * @param {object} options.keyAgreementKey
+   * - A key agreement key API with `id` and deriveSecret`.
    *
-   * @return {Promise<TransformStream>} resolves to the TransformStream.
+   * @returns {Promise<TransformStream>} Resolves to the TransformStream.
    */
   async createDecryptStream({keyAgreementKey}) {
     const transformer = await this.createDecryptTransformer(
@@ -102,13 +104,14 @@ export class Cipher {
    * in the `recipients` array will be updated to include the generated
    * ephemeral ECDH key.
    *
-   * @param {Uint8Array|String} [data] the data to encrypt.
-   * @param {Array} recipients an array of recipients for the encrypted
-   *   content.
-   * @param {function} keyResolver a function that returns a Promise
+   * @param {object} options - Options for encrypt.
+   * @param {Uint8Array|string} [options.data] - The data to encrypt.
+   * @param {Array} options.recipients
+   * - An array of recipients for the encrypted content.
+   * @param {Function} options.keyResolver - A function that returns a Promise
    *   that resolves a key ID to a DH public key.
    *
-   * @return {Promise<Object>} resolves to a JWE.
+   * @returns {Promise<object>} Resolves to a JWE.
    */
   async encrypt({data, recipients, keyResolver}) {
     if(!(data instanceof Uint8Array) && typeof data !== 'string') {
@@ -126,9 +129,9 @@ export class Cipher {
    * Encrypts an object. The object will be serialized to JSON and passed
    * to `encrypt`. See `encrypt` for other parameters.
    *
-   * @param {Object} obj the object to encrypt.
+   * @param {object} obj - The object to encrypt.
    *
-   * @return {Promise<Object>} resolves to a JWE.
+   * @returns {Promise<object>} Resolves to a JWE.
    */
   async encryptObject({obj, ...rest}) {
     if(typeof obj !== 'object') {
@@ -147,11 +150,13 @@ export class Cipher {
    * (KEK) generated via a shared secret between an ephemeral ECDH key and a
    * static ECDH key (ECDH-ES).
    *
-   * @param {Object} jwe the JWE to decrypt.
-   * @param {Object} keyAgreementKey a key agreement key API with `id` and
+   * @param {object} options - Options for decrypt.
+   * @param {object} options.jwe - The JWE to decrypt.
+   * @param {object} options.keyAgreementKey
+   * - A key agreement key API with `id` and
    *   `deriveSecret`.
    *
-   * @return {Promise<Uint8Array|null>} resolves to the decrypted data
+   * @returns {Promise<Uint8Array|null>} Resolves to the decrypted data
    *   or `null` if the decryption failed.
    */
   async decrypt({jwe, keyAgreementKey}) {
@@ -164,11 +169,12 @@ export class Cipher {
    * Decrypts a JWE that must contain an encrypted object. This method will
    * call `decrypt` and then `JSON.parse` the resulting decrypted UTF-8 data.
    *
-   * @param {Object} jwe the JWE to decrypt.
-   * @param {Object} keyAgreementKey a key agreement key API with `id` and
-   *   `deriveSecret`.
+   * @param {object} options - Options.
+   * @param {object} options.jwe - The JWE to decrypt.
+   * @param {object} options.keyAgreementKey
+   * - A key agreement key API with `id` and `deriveSecret`.
    *
-   * @return {Promise<Object|null>} resolves to the decrypted object or `null`
+   * @returns {Promise<object|null>} Resolves to the decrypted object or `null`
    *   if the decryption failed.
    */
   async decryptObject({jwe, keyAgreementKey}) {
@@ -190,14 +196,16 @@ export class Cipher {
    * in the `recipients` array will be updated to include the generated
    * ephemeral ECDH key.
    *
-   * @param {Array} recipients an array of recipients for the encrypted
-   *   content.
-   * @param {function} keyResolver a function that returns a Promise
-   *   that resolves a key ID to a DH public key.
-   * @param {number} [chunkSize=1048576] the size, in bytes, of the chunks to
+   * @param {object} options - Options for the transformer.
+   * @param {Array} options.recipients
+   * - An array of recipients for the encrypted content.
+   * @param {Function} options.keyResolver - A function that returns
+   * a Promise that resolves a key ID to a DH public key.
+   * @param {number} [options.chunkSize=1048576]
+   * - The size, in bytes, of the chunks to
    *   break the incoming data into (only applies if returning a stream).
    *
-   * @return {Promise<EncryptTransformer>} resolves to an EncryptTransformer.
+   * @returns {Promise<EncryptTransformer>} Resolves to an EncryptTransformer.
    */
   async createEncryptTransformer({recipients, keyResolver, chunkSize}) {
     if(!(Array.isArray(recipients) && recipients.length > 0)) {
@@ -259,7 +267,7 @@ export class Cipher {
   /**
    * Creates a DecryptTransformer.
    *
-   * @param {Object} keyAgreementKey - A key agreement key API with `id` and
+   * @param {object} keyAgreementKey - A key agreement key API with `id` and
    *   `deriveSecret`.
    *
    * @returns {Promise<DecryptTransformer>} Resolves to a DecryptTransformer.
