@@ -9,7 +9,7 @@
     "test-node": "cd test && npm run test-node",
     "test-karma": "cd test && karma start karma.conf.js",
     "coverage": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text-summary npm run test-node",
-    "coverage-report": "nyc report",
+    "coverage-report": "cd test && nyc report",
     "lint": "eslint ."
   },
   "files": [

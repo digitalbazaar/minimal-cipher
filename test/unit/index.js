@@ -32,6 +32,57 @@ describe('minimal-cipher should use ', function() {
         }];
       });
 
+      async function encryptStream({data}) {
+        const encryptStream = await cipher.createEncryptStream(
+          {recipients, keyResolver, chunkSize: 1});
+        const writer = encryptStream.writable.getWriter();
+        writer.write(data);
+        writer.close();
+        const reader = encryptStream.readable.getReader();
+        const chunks = [];
+        let value;
+        let done = false;
+        while(!done) {
+          try {
+            ({value, done} = await reader.read());
+            if(!done) {
+              chunks.push(value);
+            }
+          } catch(e) {
+            console.error(e);
+            throw e;
+          }
+        }
+        return chunks;
+      }
+
+      async function decryptStream({chunks}) {
+        const decryptStream = await cipher.createDecryptStream(
+          {keyAgreementKey});
+        const writer = decryptStream.writable.getWriter();
+        for(const chunk of chunks) {
+          writer.write(chunk);
+        }
+        writer.close();
+        const reader = decryptStream.readable.getReader();
+        const data = [];
+        let value;
+        let done = false;
+        while(!done) {
+          try {
+            ({value, done} = await reader.read());
+            if(!done) {
+              data.push(value);
+            }
+          } catch(e) {
+            console.error(e);
+            throw e;
+          }
+        }
+        const buf = Buffer.concat(data);
+        return new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
+      }
+
       it('to encrypt a simple Uint8Array', async function() {
         const data = new Uint8Array([0x01, 0x02, 0x03]);
         const result = await cipher.encrypt({data, recipients, keyResolver});
@@ -53,26 +104,7 @@ describe('minimal-cipher should use ', function() {
 
       it('to encrypt a stream', async function() {
         const data = new Uint8Array([0x01, 0x02, 0x03]);
-        const encryptStream = await cipher.createEncryptStream(
-          {recipients, keyResolver, chunkSize: 1});
-        const writer = encryptStream.writable.getWriter();
-        writer.write(data);
-        writer.close();
-        const reader = encryptStream.readable.getReader();
-        const chunks = [];
-        let value;
-        let done = false;
-        while(!done) {
-          try {
-            ({value, done} = await reader.read());
-            if(!done) {
-              chunks.push(value);
-            }
-          } catch(e) {
-            console.error(e);
-            throw e;
-          }
-        }
+        const chunks = await encryptStream({data});
         chunks.length.should.be.gte(0);
         for(const chunk of chunks) {
           chunk.jwe.should.be.a.JWE;
@@ -103,6 +135,18 @@ describe('minimal-cipher should use ', function() {
         jwe.should.be.a.JWE;
         const result = await cipher.decryptObject({jwe, keyAgreementKey});
         result.should.deep.equal(obj);
+      });
+
+      it('to decrypt a stream', async function() {
+        const data = new Uint8Array([0x01, 0x02, 0x03]);
+        const chunks = await encryptStream({data});
+        chunks.length.should.be.gte(0);
+        for(const chunk of chunks) {
+          chunk.jwe.should.be.a.JWE;
+        }
+        const result = await decryptStream({chunks});
+        result.length.should.be.gte(0);
+        result.should.deep.eql(data);
       });
 
     });

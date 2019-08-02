@@ -3,7 +3,7 @@ module.exports = function(config) {
   const bundler = process.env.BUNDLER || 'webpack';
   const frameworks = ['mocha'];
   const files = ['unit/index.js'];
-  const reports = ['mocha'];
+  const reporters = ['mocha'];
   const browsers = ['ChromeHeadless'];
   const client = {
     mocha: {
@@ -16,7 +16,7 @@ module.exports = function(config) {
   preprocessors.push('sourcemap');
 
   return config.set({
-    frameworks, files, reports,
+    frameworks, files, reporters,
     basePath: '', port: 9876, colors: true,
     browsers, client,
     // preprocess matching files before serving them to the browser
