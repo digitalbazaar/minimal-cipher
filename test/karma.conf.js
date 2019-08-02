@@ -18,7 +18,7 @@ module.exports = function(config) {
   return config.set({
     frameworks, files, reporters,
     basePath: '', port: 9876, colors: true,
-    browsers, client,
+    browsers, client, singleRun: true,
     // preprocess matching files before serving them to the browser
     // available preprocessors:
     // https://npmjs.org/browse/keyword/karma-preprocessor
