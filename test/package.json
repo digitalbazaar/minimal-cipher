@@ -4,7 +4,7 @@
   "description": "Unit Tests in Mocha and Karma for Minimal Cipher.",
   "main": "index.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=test mocha -t 30000 -R ${REPORTER:-spec} unit/index.js",
+    "test-node": "cross-env NODE_ENV=test mocha -t 30000 -R ${REPORTER:-spec} unit/index.js",
     "test-karma": "karma start"
   },
   "keywords": [
