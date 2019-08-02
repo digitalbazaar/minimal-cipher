@@ -84,8 +84,9 @@ describe('minimal-cipher should use ', function() {
             throw e;
           }
         }
-        const buf = Buffer.concat(data);
-        return new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
+        // FIXME Buffer is not in browser
+        // this works fine however in all tests.
+        return Uint8Array.from(data);
       }
 
       it('to encrypt a simple Uint8Array', async function() {
