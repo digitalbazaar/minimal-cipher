@@ -32,6 +32,11 @@ describe('minimal-cipher should use ', function() {
         }];
       });
 
+      function getRandomUint8({size = 50} = {}) {
+        return new Uint8Array(size).map(
+          () => Math.floor(Math.random() * 255));
+      }
+
       async function encryptStream({data}) {
         const encryptStream = await cipher.createEncryptStream(
           {recipients, keyResolver, chunkSize: 1});
@@ -84,7 +89,7 @@ describe('minimal-cipher should use ', function() {
       }
 
       it('to encrypt a simple Uint8Array', async function() {
-        const data = new Uint8Array([0x01, 0x02, 0x03]);
+        const data = getRandomUint8();
         const result = await cipher.encrypt({data, recipients, keyResolver});
         result.should.be.a.JWE;
       });
@@ -103,7 +108,7 @@ describe('minimal-cipher should use ', function() {
       });
 
       it('to encrypt a stream', async function() {
-        const data = new Uint8Array([0x01, 0x02, 0x03]);
+        const data = getRandomUint8();
         const chunks = await encryptStream({data});
         chunks.length.should.be.gte(0);
         for(const chunk of chunks) {
@@ -111,8 +116,8 @@ describe('minimal-cipher should use ', function() {
         }
       });
 
-      it('to decrypt a simple Uint8Array', async function() {
-        const data = new Uint8Array([0x01, 0x02, 0x03]);
+      it('to decrypt an Uint8Array', async function() {
+        const data = getRandomUint8();
         const jwe = await cipher.encrypt({data, recipients, keyResolver});
         jwe.should.be.a.JWE;
         const result = await cipher.decrypt({jwe, keyAgreementKey});
@@ -138,7 +143,7 @@ describe('minimal-cipher should use ', function() {
       });
 
       it('to decrypt a stream', async function() {
-        const data = new Uint8Array([0x01, 0x02, 0x03]);
+        const data = getRandomUint8();
         const chunks = await encryptStream({data});
         chunks.length.should.be.gte(0);
         for(const chunk of chunks) {
@@ -148,7 +153,6 @@ describe('minimal-cipher should use ', function() {
         result.length.should.be.gte(0);
         result.should.deep.eql(data);
       });
-
     });
   });
 });
