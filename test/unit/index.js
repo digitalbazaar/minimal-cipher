@@ -1,7 +1,8 @@
 const chai = require('chai');
-const {Cipher} = require('../../index');
+const {Cipher} = require('../../');
 const KaK = require('../KaK');
 const chaiCipher = require('../chai-cipher');
+
 chai.should();
 chai.use(chaiCipher);
 

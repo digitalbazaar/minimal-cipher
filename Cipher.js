@@ -259,10 +259,10 @@ export class Cipher {
   /**
    * Creates a DecryptTransformer.
    *
-   * @param {Object} keyAgreementKey a key agreement key API with `id` and
+   * @param {Object} keyAgreementKey - A key agreement key API with `id` and
    *   `deriveSecret`.
    *
-   * @return {Promise<DecryptTransformer>} resolves to a DecryptTransformer.
+   * @returns {Promise<DecryptTransformer>} Resolves to a DecryptTransformer.
    */
   async createDecryptTransformer({keyAgreementKey}) {
     return new DecryptTransformer({

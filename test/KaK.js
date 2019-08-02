@@ -1,4 +1,4 @@
-const bs58 = require('bs58');
+const base58 = require('../base58');
 const nacl = require('tweetnacl');
 
 class KaK {
@@ -12,11 +12,11 @@ class KaK {
   }
 
   async deriveSecret({publicKey}) {
-    const remotePublicKey = bs58.decode(publicKey.publicKeyBase58);
+    const remotePublicKey = base58.decode(publicKey.publicKeyBase58);
     return nacl.scalarMult(this.privateKey, remotePublicKey);
   }
   base58Encode(x) {
-    return bs58.encode(Buffer.from(x.buffer, x.byteOffset, x.byteLength));
+    return base58.encode(x);
   }
 }
 
