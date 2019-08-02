@@ -6,8 +6,8 @@
   "main": "index.js",
   "scripts": {
     "test": "cd test && npm run test-node",
-    "test-node": "cd test && cross-env NODE_ENV=test mocha -r esm --preserve-symlinks -t 30000 -A -R ${REPORTER:-spec} --require tests/test-mocha.js tests/*.spec.js",
-    "test-karma": "karma start karma.conf.js",
+    "test-node": "cd test && npm run test-node",
+    "test-karma": "cd test && karma start karma.conf.js",
     "coverage": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text-summary npm run test-node",
     "coverage-report": "nyc report",
     "lint": "eslint ."
