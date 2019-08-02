@@ -51,6 +51,34 @@ describe('minimal-cipher should use ', function() {
         result.should.be.a.JWE;
       });
 
+      it('to encrypt a stream', async function() {
+        const data = new Uint8Array([0x01, 0x02, 0x03]);
+        const encryptStream = await cipher.createEncryptStream(
+          {recipients, keyResolver, chunkSize: 1});
+        const writer = encryptStream.writable.getWriter();
+        writer.write(data);
+        writer.close();
+        const reader = encryptStream.readable.getReader();
+        const chunks = [];
+        let value;
+        let done = false;
+        while(!done) {
+          try {
+            ({value, done} = await reader.read());
+            if(!done) {
+              chunks.push(value);
+            }
+          } catch(e) {
+            console.error(e);
+            throw e;
+          }
+        }
+        chunks.length.should.be.gte(0);
+        for(const chunk of chunks) {
+          chunk.jwe.should.be.a.JWE;
+        }
+      });
+
       it('to decrypt a simple Uint8Array', async function() {
         const data = new Uint8Array([0x01, 0x02, 0x03]);
         const jwe = await cipher.encrypt({data, recipients, keyResolver});
