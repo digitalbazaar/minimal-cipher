@@ -1,5 +1,9 @@
+/*!
+ * Copyright (c) 2019 Digital Bazaar, Inc. All rights reserved.
+ */
 const chai = require('chai');
 const {Cipher} = require('../../');
+const {TextDecoder} = require('../../util');
 const KaK = require('../KaK');
 const chaiCipher = require('../chai-cipher');
 
@@ -8,9 +12,9 @@ chai.use(chaiCipher);
 
 const cipherAlgorithms = ['recommended', 'fips'];
 
-describe('minimal-cipher should use ', function() {
+describe('minimal-cipher', function() {
   cipherAlgorithms.forEach(algorithm => {
-    describe(`the ${algorithm} algorithm`, function() {
+    describe(`${algorithm} algorithm`, function() {
 
       // each test inits data to null
       let cipher, keyAgreementKey, publicKeyNode, recipients = null;
@@ -89,26 +93,26 @@ describe('minimal-cipher should use ', function() {
         return Uint8Array.from(data);
       }
 
-      it('to encrypt a simple Uint8Array', async function() {
+      it('should encrypt a simple Uint8Array', async function() {
         const data = getRandomUint8();
         const result = await cipher.encrypt({data, recipients, keyResolver});
         result.should.be.a.JWE;
       });
 
-      it('to encrypt a simple string', async function() {
+      it('should encrypt a simple string', async function() {
         const data = 'simple';
         const result = await cipher.encrypt({data, recipients, keyResolver});
         result.should.be.a.JWE;
       });
 
-      it('to encrypt a simple object', async function() {
+      it('should encrypt a simple object', async function() {
         const obj = {simple: true};
         const result = await cipher.encryptObject(
           {obj, recipients, keyResolver});
         result.should.be.a.JWE;
       });
 
-      it('to encrypt a stream', async function() {
+      it('should encrypt a stream', async function() {
         const data = getRandomUint8();
         const chunks = await encryptStream({data});
         chunks.length.should.be.gte(0);
@@ -117,7 +121,7 @@ describe('minimal-cipher should use ', function() {
         }
       });
 
-      it('to decrypt an Uint8Array', async function() {
+      it('should decrypt an Uint8Array', async function() {
         const data = getRandomUint8();
         const jwe = await cipher.encrypt({data, recipients, keyResolver});
         jwe.should.be.a.JWE;
@@ -125,16 +129,16 @@ describe('minimal-cipher should use ', function() {
         result.should.deep.equal(data);
       });
 
-      it('to decrypt a simple string', async function() {
+      it('should decrypt a simple string', async function() {
         const data = 'simple';
         const jwe = await cipher.encrypt({data, recipients, keyResolver});
         jwe.should.be.a.JWE;
         const result = await cipher.decrypt({jwe, keyAgreementKey});
-        const resultString = new TextDecoder('utf-8').decode(result);
+        const resultString = new TextDecoder().decode(result);
         resultString.should.deep.equal(data);
       });
 
-      it('to decrypt a simple object', async function() {
+      it('should decrypt a simple object', async function() {
         const obj = {simple: true};
         const jwe = await cipher.encryptObject(
           {obj, recipients, keyResolver});
@@ -143,7 +147,7 @@ describe('minimal-cipher should use ', function() {
         result.should.deep.equal(obj);
       });
 
-      it('to decrypt a stream', async function() {
+      it('should decrypt a stream', async function() {
         const data = getRandomUint8();
         const chunks = await encryptStream({data});
         chunks.length.should.be.gte(0);
