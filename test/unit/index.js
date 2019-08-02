@@ -3,7 +3,7 @@
  */
 const chai = require('chai');
 const {Cipher} = require('../../');
-const {TextDecoder} = require('../../util');
+const {TextDecoder, ReadableStream} = require('../../util');
 const KaK = require('../KaK');
 const chaiCipher = require('../chai-cipher');
 
@@ -42,6 +42,12 @@ describe('minimal-cipher', function() {
       }
 
       async function encryptStream({data}) {
+        const stream = new ReadableStream({
+          pull(controller) {
+            controller.enqueue(data);
+            controller.close();
+          }
+        });
         /* TODO: consider using pipeThrough pattern instead to catch errors
         ... as now `writer.write` errors won't be caught
         const stream = new Readable({
@@ -58,10 +64,8 @@ describe('minimal-cipher', function() {
         while(...)*/
         const encryptStream = await cipher.createEncryptStream(
           {recipients, keyResolver, chunkSize: 1});
-        const writer = encryptStream.writable.getWriter();
-        writer.write(data);
-        writer.close();
-        const reader = encryptStream.readable.getReader();
+        const readable = stream.pipeThrough(encryptStream);
+        const reader = readable.getReader();
         const chunks = [];
         let value;
         let done = false;
