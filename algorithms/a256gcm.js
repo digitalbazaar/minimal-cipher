@@ -20,7 +20,7 @@ export async function generateKey() {
     // key must be extractable in order to be wrapped
     true,
     ['encrypt']);
-  return crypto.subtle.exportKey('raw', key);
+  return new Uint8Array(await crypto.subtle.exportKey('raw', key));
 }
 
 /**
@@ -95,7 +95,7 @@ export async function decrypt({ciphertext, iv, tag, additionalData, cek}) {
 
 async function _importCek({cek, usages}) {
   if(!(cek instanceof Uint8Array)) {
-    throw new TypeError('"cek" must be a CryptoKey or Uint8Array.');
+    throw new TypeError('"cek" must be a Uint8Array.');
   }
   return crypto.subtle.importKey(
     'raw', cek, {name: 'AES-GCM', length: 256}, false, usages);
