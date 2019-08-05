@@ -48,20 +48,6 @@ describe('minimal-cipher', function() {
             controller.close();
           }
         });
-        /* TODO: consider using pipeThrough pattern instead to catch errors
-        ... as now `writer.write` errors won't be caught
-        const stream = new Readable({
-          pull(controller) {
-            controller.enqueue(new Uint8Array([0x01, 0x02, 0x03]));
-            controller.close();
-          }
-        });
-
-        const encryptStream = await cipher.createEncryptStream(...);
-        const readable = stream.pipeThrough(encryptStream);
-        const reader = readable.getReader();
-
-        while(...)*/
         const encryptStream = await cipher.createEncryptStream(
           {recipients, keyResolver, chunkSize: 1});
         const readable = stream.pipeThrough(encryptStream);
