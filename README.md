@@ -102,14 +102,14 @@ const recipient = {
 const recipients = [recipient];
 ```
 
-You'll also need a `keyResolver` -- notice that `recipients` lists only key IDs,
+You'll also need a `keyResolver`. Notice that `recipients` lists only key IDs,
 not the keys themselves. A `keyResolver` is a function that accepts a key ID
 and resolves to the public key corresponding to it.
 
 Some example resolvers:
 
 ```js
-// Basic embedded key resolver; you already have the key material
+// Basic hardcoded key resolver; you already have the key material
 const publicKeyNode = {
   '@context': 'https://w3id.org/security/v2',
   id: keyAgreementKey.id,
@@ -117,6 +117,15 @@ const publicKeyNode = {
   publicKeyBase58: keyAgreementKey.publicKeyBase58
 };
 const keyResolver = async () => publicKeyNode; 
+```
+
+```js
+// Using did-veres-one driver as a resolver for did:v1:nym: DID keys
+// TODO: Implement this
+```
+
+```js
+// Using the did:key method driver as a key resolver
 ```
 
 Create the JWE:
@@ -129,6 +138,16 @@ const jweDoc = await cipher.encrypt({data, recipients, keyResolver});
 // To encrypt an object
 const obj = { key: 'value' };
 const jweDoc = await cipher.encryptObject({obj, recipients, keyResolver});
+```
+
+### Decrypting
+
+Decrypt a JWE JSON Document, using a private `keyAgreementKey`:
+
+```js
+const data = await cipher.decrypt({jwe, keyAgreementKey});
+
+const object = await cipher.decryptObject({jwe, keyAgreementKey});
 ```
 
 TODO: Describe the required KEK API:
