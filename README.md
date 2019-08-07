@@ -61,7 +61,7 @@ Pick a Cipher interface (`recommended` or `fips`) and create an instance:
 ```js
 const {Cipher} = require('minimal-cipher');
 
-const cipher = new Cipher(); // by default {version='recommended'}
+const cipher = new Cipher(); // by default {version: 'recommended'}
 ```
 
 ### Encrypting
@@ -84,13 +84,20 @@ public/private key pairs that will be used to encrypt/decrypt the message):
 // Retrieve them from config, a ledger, registry or back channel
 const keyAgreementKey = await fetchFromSomewhere();
 
-// or derive them from an Ed25519 signing key
+// or derive them from an existing Ed25519 signing key
 const X25519KeyPair = require('x25519-key-pair');
 const {Ed25519KeyPair} = require('crypto-ld');
 const edKeyPair = await Ed25519KeyPair.generate();
 const keyAgreementKey = X25519KeyPair.fromEdKeyPair(edKeyPair);
 // Don't forget to set your key's id. For example, DID + fingerprint
 keyAgreementKey.id = `${did}#${keyAgreementKey.fingerprint()}`;
+
+// or derive them from an authentication key extracted from DID Document 
+const didDoc = await veresDriver.get({did});
+const authnKey = didDoc.getVerificationMethod({proofPurpose: 'authentication'});
+const edKeyPair = await Ed25519KeyPair.from(authnKey);
+const keyAgreementKey = X25519KeyPair.fromEdKeyPair(edKeyPair);
+keyAgreementKey.id = authnKey.id;
 
 const recipient = {
   header: {
@@ -120,6 +127,16 @@ const keyResolver = async () => publicKeyNode;
 ```
 
 ```js
+// A more advanced resolver based on DID doc authentication keys
+const keyResolver = async (keyId) => {
+  // Use veres driver to fetch the authn key directly
+  const authKeyPair = await Ed25519KeyPair.from(await veresDriver.get({did: keyId}));
+  // Convert authn key to key agreement key
+  return X25519KeyPair.fromEdKeyPair(authKeyPair);
+}
+```
+
+```js
 // Using did-veres-one driver as a resolver for did:v1:nym: DID keys
 // TODO: Implement this
 ```
@@ -136,7 +153,7 @@ const data = 'plain text';
 const jweDoc = await cipher.encrypt({data, recipients, keyResolver});
 
 // To encrypt an object
-const obj = { key: 'value' };
+const obj = {key: 'value'};
 const jweDoc = await cipher.encryptObject({obj, recipients, keyResolver});
 ```
 
