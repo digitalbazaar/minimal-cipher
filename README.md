@@ -77,11 +77,11 @@ you will need:
 First, assemble your Key Agreement public keys (you'll be encrypting with them, 
 and the intended recipient will use the corresponding private keys to decrypt).
 
-Put together a list of `recipients` (essentially, you're listing which keys
-are intended to decrypt the message):
+Put together a list of `recipients` (essentially, you're listing the `id`s of
+public/private key pairs that will be used to encrypt/decrypt the message):
 
 ```js
-// Retrieve them from config or from a ledger
+// Retrieve them from config, a ledger, registry or back channel
 const keyAgreementKey = await fetchFromSomewhere();
 
 // or derive them from an Ed25519 signing key
@@ -102,10 +102,21 @@ const recipient = {
 const recipients = [recipient];
 ```
 
-Create the `keyResolver`:
+You'll also need a `keyResolver` -- notice that `recipients` lists only key IDs,
+not the keys themselves. A `keyResolver` is a function that accepts a key ID
+and resolves to the public key corresponding to it.
+
+Some example resolvers:
 
 ```js
-// TODO: Explain this part
+// Basic embedded key resolver; you already have the key material
+const publicKeyNode = {
+  '@context': 'https://w3id.org/security/v2',
+  id: keyAgreementKey.id,
+  type: 'X25519KeyAgreementKey2019',
+  publicKeyBase58: keyAgreementKey.publicKeyBase58
+};
+const keyResolver = async () => publicKeyNode; 
 ```
 
 Create the JWE:
