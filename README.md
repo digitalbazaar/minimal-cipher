@@ -128,7 +128,7 @@ const keyResolver = async () => publicKeyNode;
 
 ```js
 // A more advanced resolver based on DID doc authentication keys
-const keyResolver = async (keyId) => {
+const keyResolver = async ({id}) => {
   // Use veres driver to fetch the authn key directly
   const authKeyPair = await Ed25519KeyPair.from(await veresDriver.get({did: keyId}));
   // Convert authn key to key agreement key
