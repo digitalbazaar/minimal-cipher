@@ -70,14 +70,16 @@ describe('minimal-cipher', function() {
       }
 
       async function decryptStream({chunks}) {
+        const stream = new ReadableStream({
+          pull(controller) {
+            chunks.forEach(c => controller.enqueue(c));
+            controller.close();
+          }
+        });
         const decryptStream = await cipher.createDecryptStream(
           {keyAgreementKey});
-        const writer = decryptStream.writable.getWriter();
-        for(const chunk of chunks) {
-          writer.write(chunk);
-        }
-        writer.close();
-        const reader = decryptStream.readable.getReader();
+        const readable = stream.pipeThrough(decryptStream);
+        const reader = readable.getReader();
         const data = [];
         let value;
         let done = false;
