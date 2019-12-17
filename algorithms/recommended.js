@@ -3,7 +3,7 @@
  */
 'use strict';
 
-import * as cipher from './c20p.js';
+import * as cipher from './xc20p.js';
 import * as keyAgreement from './x25519.js';
 
 export {cipher};

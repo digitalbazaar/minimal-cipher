@@ -12,6 +12,36 @@ chai.use(chaiCipher);
 
 const cipherAlgorithms = ['recommended', 'fips'];
 
+// `C20P` encrypted legacy JWE; backwards compatible support for decrypting
+// this is in this library (but cannot encrypt using it)
+const LEGACY_JWE = {
+  protected: 'eyJlbmMiOiJBMjU2R0NNIn0',
+  recipients: [
+    {
+      header: {
+        kid: 'urn:123',
+        alg: 'ECDH-ES+A256KW',
+        epk: {
+          kty: 'OKP',
+          crv: 'X25519',
+          x: 'TxnCS0ZP0g0IR9jQ1y4BDfFMfYvuzTPJiD5yhWnZxhQ'
+        },
+        apu: 'TxnCS0ZP0g0IR9jQ1y4BDfFMfYvuzTPJiD5yhWnZxhQ',
+        apv: 'dXJuOjEyMw'
+      },
+      encrypted_key: 'HxDN7bJzsbhjQfsX_erWvK-_vc7BM2zpOTvs3a_5aoIMgm0HW65cFQ'
+    }
+  ],
+  iv: '1CwAoB6bs1HPh6No',
+  ciphertext: 'iKaHhDdbGFmgkUgU5D0W',
+  tag: 'eIzP_YhcLSuX-qJANN7M7A'
+};
+
+const LEGACY_KEY_PAIR = {
+  privateKeyBase58: 'DqBNP7KkbiTJbXAA6AmfTjhQU3cMeQwtDBeM8Z92duz1',
+  publicKeyBase58: 'C5URuM3ttmRa2s7BtcBUv2688Z23prZBX5qyQWNnn9UJ'
+};
+
 describe('minimal-cipher', function() {
   cipherAlgorithms.forEach(algorithm => {
     describe(`${algorithm} algorithm`, function() {
@@ -94,8 +124,6 @@ describe('minimal-cipher', function() {
             throw e;
           }
         }
-        // FIXME Buffer is not in browser
-        // this works fine however in all tests.
         return Uint8Array.from(data);
       }
 
@@ -163,6 +191,22 @@ describe('minimal-cipher', function() {
         const result = await decryptStream({chunks});
         result.length.should.be.gte(0);
         result.should.deep.eql(data);
+      });
+
+      it('should decrypt a legacy-encrypted simple object', async function() {
+        // decrypts `C20P` JWE (now replaced by `XC20P`)
+        const jwe = LEGACY_JWE;
+        keyAgreementKey = new KaK({keyPair: LEGACY_KEY_PAIR});
+        publicKeyNode = {
+          '@context': 'https://w3id.org/security/v2',
+          id: keyAgreementKey.id,
+          type: keyAgreementKey.type,
+          publicKeyBase58: keyAgreementKey.publicKeyBase58
+        };
+        const obj = {simple: true};
+        jwe.should.be.a.JWE;
+        const result = await cipher.decryptObject({jwe, keyAgreementKey});
+        result.should.deep.equal(obj);
       });
     });
   });
