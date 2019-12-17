@@ -53,7 +53,7 @@ export class Cipher {
    * in the `recipients` array will be updated to include the generated
    * ephemeral ECDH key.
    *
-   * @param {Object} options - The options for the stream.
+   * @param {object} options - The options for the stream.
    * @param {Array} options.recipients
    * - An array of recipients for the encrypted content.
    * @param {Function} options.keyResolver - A function that returns a Promise
@@ -76,15 +76,15 @@ export class Cipher {
    * data from each chunk.
    *
    * The only JWEs currently supported use an `alg` of `ECDH-ES+A256KW` and
-   * `enc` of `A256GCM` or `C20P`. These parameters refer to data that has been
-   * encrypted using a 256-bit AES-GCM or ChaCha20Poly1305 content encryption
+   * `enc` of `A256GCM` or `XC20P`. These parameters refer to data that has been
+   * encrypted using a 256-bit AES-GCM or XChaCha20Poly1305 content encryption
    * key (CEK) that has been wrapped using a 256-bit AES-KW key encryption key
    * (KEK) generated via a shared secret between an ephemeral ECDH key and a
    * static ECDH key (ECDH-ES).
    *
-   * @param {Object} options - Options for createDecryptStream.
-   * @param {Object} options.keyAgreementKey
-   * - A key agreement key API with `id` and deriveSecret`.
+   * @param {object} options - Options for createDecryptStream.
+   * @param {object} options.keyAgreementKey - A key agreement key API with
+   *   `id` and deriveSecret`.
    *
    * @returns {Promise<TransformStream>} Resolves to the TransformStream.
    */
@@ -104,14 +104,14 @@ export class Cipher {
    * in the `recipients` array will be updated to include the generated
    * ephemeral ECDH key.
    *
-   * @param {Object} options - Options for encrypt.
+   * @param {object} options - Options for encrypt.
    * @param {Uint8Array|string} [options.data] - The data to encrypt.
-   * @param {Array} options.recipients
-   * - An array of recipients for the encrypted content.
+   * @param {Array} options.recipients - An array of recipients for the\
+   *   encrypted content.
    * @param {Function} options.keyResolver - A function that returns a Promise
    *   that resolves a key ID to a DH public key.
    *
-   * @returns {Promise<Object>} Resolves to a JWE.
+   * @returns {Promise<object>} Resolves to a JWE.
    */
   async encrypt({data, recipients, keyResolver}) {
     if(!(data instanceof Uint8Array) && typeof data !== 'string') {
@@ -129,9 +129,9 @@ export class Cipher {
    * Encrypts an object. The object will be serialized to JSON and passed
    * to `encrypt`. See `encrypt` for other parameters.
    *
-   * @param {Object} obj - The object to encrypt.
+   * @param {object} obj - The object to encrypt.
    *
-   * @returns {Promise<Object>} Resolves to a JWE.
+   * @returns {Promise<object>} Resolves to a JWE.
    */
   async encryptObject({obj, ...rest}) {
     if(typeof obj !== 'object') {
@@ -144,17 +144,19 @@ export class Cipher {
    * Decrypts a single JWE.
    *
    * The only JWEs currently supported use an `alg` of `ECDH-ES+A256KW` and
-   * `enc` of `A256GCM` or `C20P`. These parameters refer to data that has been
-   * encrypted using a 256-bit AES-GCM or ChaCha20Poly1305 content encryption
+   * `enc` of `A256GCM` or `XC20P`. These parameters refer to data that has been
+   * encrypted using a 256-bit AES-GCM or XChaCha20Poly1305 content encryption
    * key (CEK) that has been wrapped using a 256-bit AES-KW key encryption key
    * (KEK) generated via a shared secret between an ephemeral ECDH key and a
    * static ECDH key (ECDH-ES).
    *
-   * @param {Object} options - Options for decrypt.
-   * @param {Object} options.jwe - The JWE to decrypt.
-   * @param {Object} options.keyAgreementKey
-   * - A key agreement key API with `id` and
-   *   `deriveSecret`.
+   * Note: This version also supports decrypting data that was encrypted using
+   * `C20P` (ChaCha20Poly1305) for backwards compatibility.
+   *
+   * @param {object} options - Options for decrypt.
+   * @param {object} options.jwe - The JWE to decrypt.
+   * @param {object} options.keyAgreementKey - A key agreement key API with
+   *   `id` and `deriveSecret`.
    *
    * @returns {Promise<Uint8Array>} Resolves to the decrypted data
    *   or `null` if the decryption failed.
@@ -169,12 +171,12 @@ export class Cipher {
    * Decrypts a JWE that must contain an encrypted object. This method will
    * call `decrypt` and then `JSON.parse` the resulting decrypted UTF-8 data.
    *
-   * @param {Object} options - Options.
-   * @param {Object} options.jwe - The JWE to decrypt.
-   * @param {Object} options.keyAgreementKey
+   * @param {object} options - Options.
+   * @param {object} options.jwe - The JWE to decrypt.
+   * @param {object} options.keyAgreementKey
    * - A key agreement key API with `id` and `deriveSecret`.
    *
-   * @returns {Promise<Object>} Resolves to the decrypted object or `null`
+   * @returns {Promise<object>} Resolves to the decrypted object or `null`
    *   if the decryption failed.
    */
   async decryptObject({jwe, keyAgreementKey}) {
@@ -196,14 +198,14 @@ export class Cipher {
    * in the `recipients` array will be updated to include the generated
    * ephemeral ECDH key.
    *
-   * @param {Object} options - Options for the transformer.
-   * @param {Array} options.recipients
-   * - An array of recipients for the encrypted content.
+   * @param {object} options - Options for the transformer.
+   * @param {Array} options.recipients - An array of recipients for the
+   *   encrypted content.
    * @param {Function} options.keyResolver - A function that returns
-   * a Promise that resolves a key ID to a DH public key.
-   * @param {number} [options.chunkSize=1048576]
-   * - The size, in bytes, of the chunks to
-   *   break the incoming data into (only applies if returning a stream).
+   *   a Promise that resolves a key ID to a DH public key.
+   * @param {number} [options.chunkSize=1048576] - The size, in bytes, of the
+   *   chunks to break the incoming data into (only applies if returning a
+   *   stream).
    *
    * @returns {Promise<EncryptTransformer>} Resolves to an EncryptTransformer.
    */
@@ -267,7 +269,7 @@ export class Cipher {
   /**
    * Creates a DecryptTransformer.
    *
-   * @param {Object} keyAgreementKey - A key agreement key API with `id` and
+   * @param {object} keyAgreementKey - A key agreement key API with `id` and
    *   `deriveSecret`.
    *
    * @returns {Promise<DecryptTransformer>} Resolves to a DecryptTransformer.

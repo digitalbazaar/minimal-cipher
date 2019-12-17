@@ -8,9 +8,14 @@ import * as fipsAlgorithm from './algorithms/fips.js';
 import * as recAlgorithm from './algorithms/recommended.js';
 import {TextDecoder, stringToUint8Array} from './util.js';
 
+// support `C20P` for backwards compatibility
+import * as c20p from './algorithms/c20p.js';
+
 const CIPHER_ALGORITHMS = {
   [fipsAlgorithm.cipher.JWE_ENC]: fipsAlgorithm.cipher,
-  [recAlgorithm.cipher.JWE_ENC]: recAlgorithm.cipher
+  [recAlgorithm.cipher.JWE_ENC]: recAlgorithm.cipher,
+  // backwards compatibility for decryption only (*not* encryption)
+  [c20p.JWE_ENC]: c20p
 };
 
 // only supported key algorithm
