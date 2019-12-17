@@ -25,13 +25,12 @@
     "util.js"
   ],
   "dependencies": {
-    "@stablelib/chacha20poly1305": "^0.10.2",
-    "axios": "^0.18.0",
-    "base64url-universal": "^1.0.0",
-    "esm": "^3.2.22",
-    "isomorphic-webcrypto": "^1.6.1",
+    "@stablelib/chacha20poly1305": "^0.10.3",
+    "base64url-universal": "^1.1.0",
+    "esm": "^3.2.25",
+    "isomorphic-webcrypto": "^2.3.2",
     "tweetnacl": "^1.0.1",
-    "web-streams-polyfill": "^2.0.3"
+    "web-streams-polyfill": "^2.0.6"
   },
   "devDependencies": {
     "@babel/core": "^7.4.3",
