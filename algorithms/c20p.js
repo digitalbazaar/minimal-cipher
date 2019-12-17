@@ -25,7 +25,7 @@ export async function generateKey() {
  *
  * @param {object} options - The options to use.
  * @param {Uint8Array} options.data - The data to encrypt.
- * @param {Uint8Array} options.additionalData - Optional additional
+ * @param {Uint8Array} [options.additionalData] - Optional additional
  *   authentication data.
  * @param {Uint8Array} options.cek - The content encryption key to use.
  *
@@ -68,7 +68,7 @@ export async function encrypt({data, additionalData, cek}) {
  * @param {Uint8Array} options.ciphertext - The data to decrypt.
  * @param {Uint8Array} options.iv - The initialization vector (aka nonce).
  * @param {Uint8Array} options.tag - The authentication tag.
- * @param {Uint8Array} options.additionalData - Optional additional
+ * @param {Uint8Array} [options.additionalData] - Optional additional
  *   authentication data.
  * @param {Uint8Array} options.cek - The content encryption key to use.
  *
