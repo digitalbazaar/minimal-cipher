@@ -4,8 +4,6 @@
 'use strict';
 
 import crypto from '../crypto.js';
-// TODO: replace with forge once available?
-// TODO: replace with XChaCha20Poly1305 once available
 import {ChaCha20Poly1305, KEY_LENGTH} from '@stablelib/chacha20poly1305';
 
 export const JWE_ENC = 'C20P';
@@ -14,7 +12,7 @@ export const JWE_ENC = 'C20P';
  * Generates a content encryption key (CEK). The 256-bit key is intended to be
  * used as a ChaCha20Poly1305 (RFC8439) key.
  *
- * @return {Promise<Uint8Array>} resolves to the generated key.
+ * @returns {Promise<Uint8Array>} Resolves to the generated key.
  */
 export async function generateKey() {
   // generate content encryption key
@@ -22,14 +20,16 @@ export async function generateKey() {
 }
 
 /**
- * Encrypts some data. The data will be encrypted using the given 256-bit
- * ChaCha20Poly1305 (RFC8439) content encryption key (CEK).
+ * Encrypts some data. The data will be encrypted using the given
+ * 256-bit ChaCha20Poly1305 (RFC8439) content encryption key (CEK).
  *
- * @param {Uint8Array} data the data to encrypt.
- * @param {Uint8Array} additionalData optional additional authentication data.
- * @param {Uint8Array} the content encryption key to use.
+ * @param {object} options - The options to use.
+ * @param {Uint8Array} options.data - The data to encrypt.
+ * @param {Uint8Array} options.additionalData - Optional additional
+ *   authentication data.
+ * @param {Uint8Array} options.cek - The content encryption key to use.
  *
- * @return {Promise<Object>} resolves to `{ciphertext, iv, tag}`.
+ * @returns {Promise<object>} Resolves to `{ciphertext, iv, tag}`.
  */
 export async function encrypt({data, additionalData, cek}) {
   if(!(data instanceof Uint8Array)) {
@@ -64,13 +64,15 @@ export async function encrypt({data, additionalData, cek}) {
  * Decrypts some encrypted data. The data must have been encrypted using
  * the given ChaCha20Poly1305 (RFC8439) content encryption key (CEK).
  *
- * @param {Uint8Array} ciphertext the data to decrypt.
- * @param {Uint8Array} iv the initialization vector (aka nonce).
- * @param {Uint8Array} tag the authentication tag.
- * @param {Uint8Array} additionalData optional additional authentication data.
- * @param {Uint8Array} cek the content encryption key to use.
+ * @param {object} options - The options to use.
+ * @param {Uint8Array} options.ciphertext - The data to decrypt.
+ * @param {Uint8Array} options.iv - The initialization vector (aka nonce).
+ * @param {Uint8Array} options.tag - The authentication tag.
+ * @param {Uint8Array} options.additionalData - Optional additional
+ *   authentication data.
+ * @param {Uint8Array} options.cek - The content encryption key to use.
  *
- * @return {Promise<Uint8Array>} the decrypted data.
+ * @returns {Promise<Uint8Array>} The decrypted data.
  */
 export async function decrypt({ciphertext, iv, tag, additionalData, cek}) {
   if(!(iv instanceof Uint8Array)) {
