@@ -1,6 +1,6 @@
 # minimal-cipher ChangeLog
 
-## 1.1.0 - 2019-12-xx
+## 1.1.0 - 2019-12-17
 
 ### Added
 - Use XChaCha20Poly1305 (instead of ChaCha20Poly1305) for the
