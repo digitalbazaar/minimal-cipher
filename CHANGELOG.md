@@ -1,5 +1,8 @@
 # minimal-cipher ChangeLog
 
+### Changed
+- Update dependencies.
+
 ## 1.1.0 - 2019-12-17
 
 ### Added
