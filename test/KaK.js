@@ -1,4 +1,4 @@
-const base58 = require('../base58');
+const base58 = require('base58-universal');
 const nacl = require('tweetnacl');
 
 class KaK {

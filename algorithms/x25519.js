@@ -5,7 +5,7 @@
 
 import base64url from 'base64url-universal';
 import {createKek} from './aeskw.js';
-import * as base58 from '../base58.js';
+import * as base58 from 'base58-universal';
 import {deriveKey} from './ecdhkdf.js';
 import nacl from 'tweetnacl';
 import {TextEncoder} from '../util.js';
