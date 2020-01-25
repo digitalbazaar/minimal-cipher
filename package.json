@@ -15,8 +15,6 @@
     "DecryptTransformer.js",
     "EncryptTransformer.js",
     "algorithms/*.js",
-    "baseN.js",
-    "base58.js",
     "crypto-browser.js",
     "crypto.js",
     "index.js",
@@ -27,6 +25,7 @@
   "dependencies": {
     "@stablelib/chacha20poly1305": "^0.10.3",
     "@stablelib/xchacha20poly1305": "^0.1.1",
+    "base58-universal": "^1.0.0",
     "base64url-universal": "^1.1.0",
     "esm": "^3.2.25",
     "isomorphic-webcrypto": "^2.3.2",
