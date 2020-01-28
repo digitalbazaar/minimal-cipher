@@ -1,5 +1,7 @@
 # minimal-cipher ChangeLog
 
+## 1.2.0 - 2020-01-28
+
 ### Changed
 - Update dependencies.
 - Use base58-universal.
