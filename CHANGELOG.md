@@ -1,5 +1,10 @@
 # minimal-cipher ChangeLog
 
+## 1.3.0 - 2020-03-18
+
+### Added
+- Add validation of parameters in DecryptTransformer constructor.
+
 ## 1.2.0 - 2020-01-28
 
 ### Changed
