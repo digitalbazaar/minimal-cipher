@@ -26,6 +26,12 @@ export class DecryptTransformer {
     keyAgreement,
     keyAgreementKey
   } = {}) {
+    if(!keyAgreement) {
+      throw new TypeError('"keyAgreement" is a required parameter.');
+    }
+    if(!keyAgreementKey) {
+      throw new TypeError('"keyAgreementKey" is a required parameter.');
+    }
     this.keyAgreement = keyAgreement;
     this.keyAgreementKey = keyAgreementKey;
   }
