@@ -74,7 +74,6 @@ export class DecryptTransformer {
       header = JSON.parse(new TextDecoder().decode(
         base64url.decode(jwe.protected)));
     } catch(e) {
-      console.log('e', e);
       throw new Error('Invalid JWE "protected" header.');
     }
     if(!(header.enc && typeof header.enc === 'string')) {
