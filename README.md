@@ -27,10 +27,8 @@ In the event that the FIPS-compliant algorithm is the same as the recommended
 one in a given version of this library, then that particular version will
 use the same algorithm regardless of the user specified "version".
 
-This version of the library will use "ChaCha20-Poly1305" as the "recommended"
-version and 256-bit "AES-GCM" as the FIPS-compliant version. A future version
-of this library that uses "XChaCha20-Poly1305" as the "recommended" version
-will be released when a browser-compatible implementation becomes available.
+This version of the library will use "XChaCha20-Poly1305" as the "recommended"
+version and 256-bit "AES-GCM" as the FIPS-compliant version.
 
 Note: XSalsa20-Poly1305 is an AE (Authenticated Encryption) algorithm, not
 an AEAD (Authenticated Encryption and Associated Data) algorithm, making it
