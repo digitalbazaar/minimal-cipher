@@ -23,7 +23,8 @@
     "index.js",
     "main.js",
     "util-browser.js",
-    "util.js"
+    "util.js",
+    "env.js"
   ],
   "dependencies": {
     "@stablelib/chacha20poly1305": "^0.10.3",

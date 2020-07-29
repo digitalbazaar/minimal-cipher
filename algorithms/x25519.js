@@ -1,14 +1,21 @@
 /*!
  * Copyright (c) 2019 Digital Bazaar, Inc. All rights reserved.
  */
-'use strict';
-
 import base64url from 'base64url-universal';
 import {createKek} from './aeskw.js';
 import * as base58 from 'base58-universal';
 import {deriveKey} from './ecdhkdf.js';
 import nacl from 'tweetnacl';
 import {TextEncoder} from '../util.js';
+import env from '../env.js';
+
+const PUBLIC_KEY_DER_PREFIX = new Uint8Array([
+  48, 42, 48, 5, 6, 3, 43, 101, 110, 3, 33, 0
+]);
+
+const PRIVATE_KEY_DER_PREFIX = new Uint8Array([
+  48, 46, 2, 1, 0, 48, 5, 6, 3, 43, 101, 110, 4, 34, 4, 32
+]);
 
 const KEY_TYPE = 'X25519KeyAgreementKey2019';
 
@@ -16,7 +23,23 @@ export const JWE_ALG = 'ECDH-ES+A256KW';
 
 export async function deriveEphemeralKeyPair() {
   // generate X25519 ephemeral public key
-  const keyPair = nacl.box.keyPair();
+  let keyPair;
+  if(await _hasNodeDiffieHellman()) {
+    const crypto = await import('crypto');
+    const {promisify} = await import('util');
+    const generateKeyPairAsync = promisify(crypto.generateKeyPair);
+    const publicKeyEncoding = {format: 'der', type: 'spki'};
+    const privateKeyEncoding = {format: 'der', type: 'pkcs8'};
+    const {publicKey: publicDerBytes, privateKey: privateDerBytes} =
+      await generateKeyPairAsync('x25519', {
+        publicKeyEncoding, privateKeyEncoding
+      });
+    const publicKey = publicDerBytes.slice(12, 12 + 32);
+    const secretKey = privateDerBytes.slice(16, 16 + 32);
+    keyPair = {secretKey, publicKey};
+  } else {
+    keyPair = nacl.box.keyPair();
+  }
   const {secretKey: privateKey, publicKey} = keyPair;
   return {
     privateKey,
@@ -93,6 +116,29 @@ export async function kekFromStaticPeer({ephemeralKeyPair, staticPublicKey}) {
 }
 
 async function deriveSecret({privateKey, remotePublicKey}) {
+  if(await _hasNodeDiffieHellman()) {
+    const crypto = await import('crypto');
+    const nodePrivateKey = crypto.createPrivateKey({
+      key: Buffer.concat([PRIVATE_KEY_DER_PREFIX, privateKey]),
+      format: 'der',
+      type: 'pkcs8'
+    });
+    const nodePublicKey = crypto.createPublicKey({
+      key: Buffer.concat([PUBLIC_KEY_DER_PREFIX, remotePublicKey]),
+      format: 'der',
+      type: 'spki'
+    });
+    return crypto.diffieHellman({
+      privateKey: nodePrivateKey,
+      publicKey: nodePublicKey,
+    });
+  }
+
   // `scalarMult` takes secret key as param 1, public key as param 2
   return nacl.scalarMult(privateKey, remotePublicKey);
+}
+
+async function _hasNodeDiffieHellman() {
+  // crypto.diffieHellman was added in Node.js v13.9.0
+  return (env.nodejs && (await import('crypto')).diffieHellman);
 }
