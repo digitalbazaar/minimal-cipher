@@ -54,12 +54,12 @@ export class Cipher {
    * ephemeral ECDH key.
    *
    * @param {object} options - The options for the stream.
-   * @param {Array} options.recipients
-   * - An array of recipients for the encrypted content.
+   * @param {Array} options.recipients - An array of recipients for the
+   *   encrypted content.
    * @param {Function} options.keyResolver - A function that returns a Promise
    *   that resolves a key ID to a DH public key.
-   * @param {number} [options.chunkSize=1048576]
-   * - The size, in bytes, of the chunks to break the incoming data into.
+   * @param {number} [options.chunkSize=1048576] - The size, in bytes,
+   *   of the chunks to break the incoming data into.
    *
    * @returns {Promise<TransformStream>} Resolves to a TransformStream.
    */
@@ -158,7 +158,7 @@ export class Cipher {
    * @param {object} options.keyAgreementKey - A key agreement key API with
    *   `id` and `deriveSecret`.
    *
-   * @returns {Promise<Uint8Array>} Resolves to the decrypted data
+   * @returns {Promise<Uint8Array>} - Resolves to the decrypted data
    *   or `null` if the decryption failed.
    */
   async decrypt({jwe, keyAgreementKey}) {
@@ -173,10 +173,10 @@ export class Cipher {
    *
    * @param {object} options - Options.
    * @param {object} options.jwe - The JWE to decrypt.
-   * @param {object} options.keyAgreementKey
-   * - A key agreement key API with `id` and `deriveSecret`.
+   * @param {object} options.keyAgreementKey - A key agreement key API with
+   *   `id` and `deriveSecret`.
    *
-   * @returns {Promise<object>} Resolves to the decrypted object or `null`
+   * @returns {Promise<object>} - Resolves to the decrypted object or `null`
    *   if the decryption failed.
    */
   async decryptObject({jwe, keyAgreementKey}) {
@@ -207,7 +207,7 @@ export class Cipher {
    *   chunks to break the incoming data into (only applies if returning a
    *   stream).
    *
-   * @returns {Promise<EncryptTransformer>} Resolves to an EncryptTransformer.
+   * @returns {Promise<EncryptTransformer>} - Resolves to an EncryptTransformer.
    */
   async createEncryptTransformer({recipients, keyResolver, chunkSize}) {
     if(!(Array.isArray(recipients) && recipients.length > 0)) {
@@ -272,7 +272,7 @@ export class Cipher {
    * @param {object} keyAgreementKey - A key agreement key API with `id` and
    *   `deriveSecret`.
    *
-   * @returns {Promise<DecryptTransformer>} Resolves to a DecryptTransformer.
+   * @returns {Promise<DecryptTransformer>} - Resolves to a DecryptTransformer.
    */
   async createDecryptTransformer({keyAgreementKey}) {
     return new DecryptTransformer({

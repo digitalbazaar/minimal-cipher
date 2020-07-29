@@ -29,19 +29,21 @@ const KEY_LENGTH = 256;
 
 /**
  * Derives a 256-bit AES-KW key encryption key from a shared secret that
- * was derived from an ephemeral and static pair of Elliptic Curve
- * Diffie-Hellman keys.
+ * was derived from an ephemeral and static pair
+ * of Elliptic Curve Diffie-Hellman keys.
  *
  * The KDF used is described in RFC 7518. This KDF is referenced by RFC 8037,
  * which defines how to perform Curve25519 (X25519) ECDH key agreement.
  *
- * @param {Uint8Array} secret the shared secret (i.e., `Z`) to use.
- * @param {Uint8Array} consumerInfo an array of application-specific bytes
- *   describing the consumer (aka the "encrypter" or "sender").
- * @param {Uint8Array} producerInfo an array of application-specific bytes
- *   describing the producer (aka the "decrypter" or "receiver"/"recipient").
+ * @param {object} options - The options to use.
+ * @param {Uint8Array} options.secret - The shared secret (i.e., `Z`) to use.
+ * @param {Uint8Array} options.consumerInfo - An array of application-specific
+ *   bytes describing the consumer (aka the "encrypter" or "sender").
+ * @param {Uint8Array} options.producerInfo - An array of application-specific
+ *   bytes describing the producer (aka the "decrypter" or
+ *   "receiver"/"recipient").
  *
- * @return {Promise<Uint8Array>} resolves to the generated key.
+ * @returns {Promise<Uint8Array>} - Resolves to the generated key.
  */
 export async function deriveKey({secret, producerInfo, consumerInfo}) {
   if(!(secret instanceof Uint8Array && secret.length > 0)) {

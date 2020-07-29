@@ -12,7 +12,7 @@ export const JWE_ENC = 'XC20P';
  * Generates a content encryption key (CEK). The 256-bit key is intended to be
  * used as a XChaCha20Poly1305 (draft-irtf-cfrg-xchacha-01) key.
  *
- * @returns {Promise<Uint8Array>} Resolves to the generated key.
+ * @returns {Promise<Uint8Array>} - Resolves to the generated key.
  */
 export async function generateKey() {
   // generate content encryption key
@@ -30,7 +30,7 @@ export async function generateKey() {
  *   authentication data.
  * @param {Uint8Array} options.cek - The content encryption key to use.
  *
- * @returns {Promise<object>} Resolves to `{ciphertext, iv, tag}`.
+ * @returns {Promise<object>} - Resolves to `{ciphertext, iv, tag}`.
  */
 export async function encrypt({data, additionalData, cek}) {
   if(!(data instanceof Uint8Array)) {
