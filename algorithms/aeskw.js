@@ -15,11 +15,11 @@ class Kek {
   /**
    * Wraps a cryptographic key.
    *
-   * @param {Object} options - The options to use.
+   * @param {object} options - The options to use.
    * @param {Uint8Array} options.unwrappedKey - The key material as a
    *   `Uint8Array`.
    *
-   * @returns {Promise<string>} The base64url-encoded wrapped key bytes.
+   * @returns {Promise<string>} - The base64url-encoded wrapped key bytes.
    */
   async wrapKey({unwrappedKey}) {
     const kek = this.key;
@@ -37,11 +37,11 @@ class Kek {
   /**
    * Unwraps a cryptographic key.
    *
-   * @param {Object} options - The options to use.
+   * @param {object} options - The options to use.
    * @param {string} options.wrappedKey - The wrapped key material as a
    *   base64url-encoded string.
    *
-   * @returns {Promise<Uint8Array>} Resolves to the key bytes or null if
+   * @returns {Promise<Uint8Array>} - Resolves to the key bytes or null if
    *   the unwrapping fails because the key does not match.
    */
   async unwrapKey({wrappedKey}) {

@@ -11,7 +11,7 @@ export const JWE_ENC = 'A256GCM';
  * Generates a content encryption key (CEK). The 256-bit key is intended to be
  * used as an AES-GCM key.
  *
- * @return {Promise<Uint8Array>} resolves to the generated key.
+ * @returns {Promise<Uint8Array>} - Resolves to the generated key.
  */
 export async function generateKey() {
   // generate content encryption key
@@ -27,11 +27,14 @@ export async function generateKey() {
  * Encrypts some data. The data will be encrypted using the given 256-bit
  * AES-GCM content encryption key (CEK).
  *
- * @param {Uint8Array} data the data to encrypt.
- * @param {Uint8Array} additionalData optional additional authentication data.
- * @param {Uint8Array} the content encryption key to use.
+ * @param {object} options - The options to use.
+ * @param {Uint8Array} options.data - The data to encrypt.
+ * @param {Uint8Array} options.additionalData - Optional additional
+ *   authentication data.
+ * @param {Uint8Array} options.cek - The content encryption key to use.
  *
- * @return {Promise<Object>} resolves to `{ciphertext, iv, tag}`.
+ * @returns {Promise<object>} - A Promise that resolves to
+ *   `{ciphertext, iv, tag}`.
  */
 export async function encrypt({data, additionalData, cek}) {
   cek = await _importCek({cek, usages: ['encrypt']});
@@ -62,13 +65,15 @@ export async function encrypt({data, additionalData, cek}) {
  * Decrypts some encrypted data. The data must have been encrypted using
  * the given 256-bit AES-GCM content encryption key.
  *
- * @param {Uint8Array} ciphertext the data to decrypt.
- * @param {Uint8Array} iv the initialization vector.
- * @param {Uint8Array} tag the authentication tag.
- * @param {Uint8Array} additionalData optional additional authentication data.
- * @param {Uint8Array} cek the content encryption key to use.
+ * @param {object} options - The options to use.
+ * @param {Uint8Array} options.ciphertext - The data to decrypt.
+ * @param {Uint8Array} options.iv - The initialization vector.
+ * @param {Uint8Array} options.tag - The authentication tag.
+ * @param {Uint8Array} options.additionalData - Optional additional
+ *   authentication data.
+ * @param {Uint8Array} options.cek - The content encryption key to use.
  *
- * @return {Promise<Uint8Array>} the decrypted data.
+ * @returns {Promise<Uint8Array>} - The decrypted data.
  */
 export async function decrypt({ciphertext, iv, tag, additionalData, cek}) {
   if(!(iv instanceof Uint8Array)) {
