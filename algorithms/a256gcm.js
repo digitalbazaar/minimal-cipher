@@ -1,8 +1,6 @@
 /*!
  * Copyright (c) 2019 Digital Bazaar, Inc. All rights reserved.
  */
-'use strict';
-
 import crypto from '../crypto.js';
 
 export const JWE_ENC = 'A256GCM';
