@@ -1,5 +1,5 @@
 /*!
- * Copyright (c) 2019 Digital Bazaar, Inc. All rights reserved.
+ * Copyright (c) 2019-2020 Digital Bazaar, Inc. All rights reserved.
  */
 import crypto from '../crypto.js';
 import {XChaCha20Poly1305, KEY_LENGTH} from '@stablelib/xchacha20poly1305';
