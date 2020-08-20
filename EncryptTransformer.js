@@ -1,8 +1,6 @@
 /*!
  * Copyright (c) 2019-2020 Digital Bazaar, Inc. All rights reserved.
  */
-'use strict';
-
 import base64url from 'base64url-universal';
 
 // 1 MiB = 1048576

@@ -2,8 +2,12 @@
  * Copyright (c) 2019-2020 Digital Bazaar, Inc. All rights reserved.
  */
 import base64url from 'base64url-universal';
-import env from '../env.js';
 import nacl from 'tweetnacl';
+import * as crypto from 'crypto';
+import * as util from 'util';
+const {promisify} = util;
+
+const generateKeyPairAsync = promisify(crypto.generateKeyPair);
 
 const PUBLIC_KEY_DER_PREFIX = new Uint8Array([
   48, 42, 48, 5, 6, 3, 43, 101, 110, 3, 33, 0
@@ -17,9 +21,6 @@ export async function deriveEphemeralKeyPair() {
   // generate X25519 ephemeral public key
   let keyPair;
   if(await _hasNodeDiffieHellman()) {
-    const crypto = await import('crypto');
-    const {promisify} = await import('util');
-    const generateKeyPairAsync = promisify(crypto.generateKeyPair);
     const publicKeyEncoding = {format: 'der', type: 'spki'};
     const privateKeyEncoding = {format: 'der', type: 'pkcs8'};
     const {publicKey: publicDerBytes, privateKey: privateDerBytes} =
@@ -46,7 +47,6 @@ export async function deriveEphemeralKeyPair() {
 
 export async function deriveSecret({privateKey, remotePublicKey}) {
   if(await _hasNodeDiffieHellman()) {
-    const crypto = await import('crypto');
     const nodePrivateKey = crypto.createPrivateKey({
       key: Buffer.concat([PRIVATE_KEY_DER_PREFIX, privateKey]),
       format: 'der',
@@ -69,5 +69,5 @@ export async function deriveSecret({privateKey, remotePublicKey}) {
 
 async function _hasNodeDiffieHellman() {
   // crypto.diffieHellman was added in Node.js v13.9.0
-  return (env.nodejs && (await import('crypto')).diffieHellman);
+  return !!crypto.diffieHellman;
 }

@@ -6,12 +6,12 @@ import {createKek} from './aeskw.js';
 import * as base58 from 'base58-universal';
 import {deriveKey} from './ecdhkdf.js';
 import {TextEncoder} from '../util.js';
-import {deriveSecret} from './diffieHellman.js';
+import {deriveSecret, deriveEphemeralKeyPair} from './x25519-helper.js';
 
 const KEY_TYPE = 'X25519KeyAgreementKey2019';
 
 export const JWE_ALG = 'ECDH-ES+A256KW';
-export {deriveEphemeralKeyPair} from './diffieHellman.js';
+export {deriveEphemeralKeyPair, deriveSecret};
 
 // Decryption case: get Kek from a private key agreement key and a
 // peer's public ephemeral DH key encoded as an `epk`
@@ -75,4 +75,3 @@ export async function kekFromStaticPeer({ephemeralKeyPair, staticPublicKey}) {
     ephemeralPublicKey: ephemeralKeyPair.publicKey
   };
 }
-

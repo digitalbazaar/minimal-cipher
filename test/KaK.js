@@ -5,7 +5,7 @@
 
 const base58 = require('base58-universal');
 const nacl = require('tweetnacl');
-const {deriveSecret: dhDeriveSecret} = require('../algorithms/diffieHellman');
+const {deriveSecret: dhDeriveSecret} = require('../algorithms/x25519');
 
 module.exports = class KaK {
   constructor({keyPair} = {}) {
