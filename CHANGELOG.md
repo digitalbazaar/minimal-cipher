@@ -1,5 +1,10 @@
 # minimal-cipher ChangeLog
 
+## 1.4.0 - 2020-08-20
+
+### Changed
+- Use Node.js `crypto.diffieHellman` for computing DH secret when available.
+
 ## 1.3.0 - 2020-03-18
 
 ### Added
