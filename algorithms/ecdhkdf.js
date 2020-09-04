@@ -10,7 +10,7 @@ const KEY_ALGORITHM = 'ECDH-ES+A256KW';
 // create static ALGORITHM_ID
 const ALGORITHM_CONTENT = new TextEncoder().encode(KEY_ALGORITHM);
 const ALGORITHM_ID = new Uint8Array(4 + ALGORITHM_CONTENT.length);
-// write length of content as 32-bite big endian integer, then write content
+// write length of content as 32-bit big endian integer, then write content
 const dv = new DataView(
   ALGORITHM_ID.buffer,
   ALGORITHM_ID.byteOffset,
@@ -35,9 +35,9 @@ const KEY_LENGTH = 256;
  *
  * @param {object} options - The options to use.
  * @param {Uint8Array} options.secret - The shared secret (i.e., `Z`) to use.
- * @param {Uint8Array} options.consumerInfo - An array of application-specific
- *   bytes describing the consumer (aka the "encrypter" or "sender").
  * @param {Uint8Array} options.producerInfo - An array of application-specific
+ *   bytes describing the consumer (aka the "encrypter" or "sender").
+ * @param {Uint8Array} options.consumerInfo - An array of application-specific
  *   bytes describing the producer (aka the "decrypter" or
  *   "receiver"/"recipient").
  *
