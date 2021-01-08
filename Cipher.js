@@ -127,7 +127,9 @@ export class Cipher {
    * Encrypts an object. The object will be serialized to JSON and passed
    * to `encrypt`. See `encrypt` for other parameters.
    *
-   * @param {object} obj - The object to encrypt.
+   * @param {object} options - Options to use.
+   * @param {object} options.obj - The object to encrypt.
+   * @param {object} options.rest - The other options to be passed to encrypt.
    *
    * @returns {Promise<object>} Resolves to a JWE.
    */
@@ -267,8 +269,9 @@ export class Cipher {
   /**
    * Creates a DecryptTransformer.
    *
-   * @param {object} keyAgreementKey - A key agreement key API with `id` and
-   *   `deriveSecret`.
+   * @param {object} options - Options to use.
+   * @param {object} options.keyAgreementKey - A key agreement key API with
+   *   `id` and `deriveSecret`.
    *
    * @returns {Promise<DecryptTransformer>} - Resolves to a DecryptTransformer.
    */
