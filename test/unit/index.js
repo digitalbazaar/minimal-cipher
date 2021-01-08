@@ -73,11 +73,12 @@ describe('minimal-cipher', function() {
           () => Math.floor(Math.random() * 255));
       }
 
-      async function encryptStream({data, chunkSize = 5}) {
+      async function encryptStream({data, queSize = 5, chunkSize = 5}) {
         const stream = new ReadableStream({
           pull(controller) {
-            for(let i = 0; i < data.length; i += chunkSize) {
-              const chunk = data.slice(i, i + chunkSize);
+            // break the unit8Array into chunks using queSize
+            for(let i = 0; i < data.length; i += queSize) {
+              const chunk = data.slice(i, i + queSize);
               controller.enqueue(chunk);
             }
             controller.close();
@@ -193,10 +194,22 @@ describe('minimal-cipher', function() {
         result.should.deep.equal(obj);
       });
 
-      it('should decrypt a stream', async function() {
-        const data = getRandomUint8();
-        const chunks = await encryptStream({data});
-        chunks.length.should.be.gte(0);
+      it('should decrypt a stream with chunkSize 1', async function() {
+        const data = getRandomUint8({size: 100});
+        const chunks = await encryptStream({data, chunkSize: 1});
+        chunks.length.should.eql(100);
+        for(const chunk of chunks) {
+          chunk.jwe.should.be.a.JWE;
+        }
+        const result = await decryptStream({chunks});
+        result.length.should.be.gte(0);
+        result.should.deep.eql(data);
+      });
+
+      it('should decrypt a stream with chunkSize 5', async function() {
+        const data = getRandomUint8({size: 100});
+        const chunks = await encryptStream({data, chunkSize: 5});
+        chunks.length.should.eql(20);
         for(const chunk of chunks) {
           chunk.jwe.should.be.a.JWE;
         }
