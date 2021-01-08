@@ -1,5 +1,11 @@
 # minimal-cipher ChangeLog
 
+### 1.4.1 - TBD
+### Changed
+- JSDOC comments in `Cipher.js`.
+- Upgraded eslint to ^7.0.0.
+- Upgraded eslint-plugin-jsdoc to ^ 37.0.0.
+
 ## 1.4.0 - 2020-08-20
 
 ### Changed
