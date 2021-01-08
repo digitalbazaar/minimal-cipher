@@ -73,15 +73,18 @@ describe('minimal-cipher', function() {
           () => Math.floor(Math.random() * 255));
       }
 
-      async function encryptStream({data}) {
+      async function encryptStream({data, chunkSize = 5}) {
         const stream = new ReadableStream({
           pull(controller) {
-            controller.enqueue(data);
+            for(let i = 0; i < data.length; i += chunkSize) {
+              const chunk = data.slice(i, i + chunkSize);
+              controller.enqueue(chunk);
+            }
             controller.close();
           }
         });
         const encryptStream = await cipher.createEncryptStream(
-          {recipients, keyResolver, chunkSize: 1});
+          {recipients, keyResolver, chunkSize});
         const readable = stream.pipeThrough(encryptStream);
         const reader = readable.getReader();
         const chunks = [];
@@ -112,14 +115,21 @@ describe('minimal-cipher', function() {
           {keyAgreementKey});
         const readable = stream.pipeThrough(decryptStream);
         const reader = readable.getReader();
-        const data = [];
+        let data = new Uint8Array(0);
         let value;
         let done = false;
         while(!done) {
           try {
             ({value, done} = await reader.read());
             if(!done) {
-              data.push(value);
+              // create a new array with the new length
+              const next = new Uint8Array(data.length + value.length);
+              // set the first values to the existing chunk
+              next.set(data);
+              // set the chunk's values to the rest of the array
+              next.set(value, data.length);
+              // update the streamData
+              data = next;
             }
           } catch(e) {
             console.error(e);
