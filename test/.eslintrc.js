@@ -3,4 +3,4 @@ module.exports = {
     browser: true,
     mocha: true
   }
-}
+};

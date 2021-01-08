@@ -13,4 +13,4 @@ module.exports = {
     TextEncoder: true,
     Uint8Array: true
   }
-}
+};
