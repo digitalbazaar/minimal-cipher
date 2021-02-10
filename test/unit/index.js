@@ -73,12 +73,12 @@ describe('minimal-cipher', function() {
           () => Math.floor(Math.random() * 255));
       }
 
-      async function encryptStream({data, queSize = 5, chunkSize = 5}) {
+      async function encryptStream({data, queueSize = 5, chunkSize = 5}) {
         const stream = new ReadableStream({
           pull(controller) {
-            // break the unit8Array into chunks using queSize
-            for(let i = 0; i < data.length; i += queSize) {
-              const chunk = data.slice(i, i + queSize);
+            // break the unit8Array into chunks using queueSize
+            for(let i = 0; i < data.length; i += queueSize) {
+              const chunk = data.slice(i, i + queueSize);
               controller.enqueue(chunk);
             }
             controller.close();
@@ -173,7 +173,7 @@ describe('minimal-cipher', function() {
         const jwe = await cipher.encrypt({data, recipients, keyResolver});
         jwe.should.be.a.JWE;
         const result = await cipher.decrypt({jwe, keyAgreementKey});
-        result.should.deep.equal(data);
+        result.should.eql(data);
       });
 
       it('should decrypt a simple string', async function() {
@@ -182,7 +182,7 @@ describe('minimal-cipher', function() {
         jwe.should.be.a.JWE;
         const result = await cipher.decrypt({jwe, keyAgreementKey});
         const resultString = new TextDecoder().decode(result);
-        resultString.should.deep.equal(data);
+        resultString.should.eql(data);
       });
 
       it('should decrypt a simple object', async function() {
@@ -191,7 +191,7 @@ describe('minimal-cipher', function() {
           {obj, recipients, keyResolver});
         jwe.should.be.a.JWE;
         const result = await cipher.decryptObject({jwe, keyAgreementKey});
-        result.should.deep.equal(obj);
+        result.should.eql(obj);
       });
 
       it('should decrypt a stream with chunkSize 1 byte', async function() {
@@ -202,7 +202,7 @@ describe('minimal-cipher', function() {
           chunk.jwe.should.be.a.JWE;
         }
         const result = await decryptStream({chunks});
-        result.length.should.be.gte(0);
+        result.length.should.eql(data.length);
         result.should.deep.eql(data);
       });
 
@@ -214,20 +214,20 @@ describe('minimal-cipher', function() {
           chunk.jwe.should.be.a.JWE;
         }
         const result = await decryptStream({chunks});
-        result.length.should.be.gte(0);
+        result.length.should.eql(data.length);
         result.should.deep.eql(data);
       });
 
       it('should decrypt a stream with chunkSize 1 megabyte', async function() {
         const data = getRandomUint8({size: 100});
         const chunks = await encryptStream(
-          {data, chunkSize: 1048576, queSize: 1});
+          {data, chunkSize: 1048576, queueSize: 1});
         chunks.length.should.eql(1);
         for(const chunk of chunks) {
           chunk.jwe.should.be.a.JWE;
         }
         const result = await decryptStream({chunks});
-        result.length.should.be.gte(0);
+        result.length.should.eql(data.length);
         result.should.deep.eql(data);
       });
 
@@ -244,7 +244,7 @@ describe('minimal-cipher', function() {
         const obj = {simple: true};
         jwe.should.be.a.JWE;
         const result = await cipher.decryptObject({jwe, keyAgreementKey});
-        result.should.deep.equal(obj);
+        result.should.eql(obj);
       });
     });
   });

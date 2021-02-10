@@ -6,6 +6,12 @@
 - Upgraded eslint to ^7.0.0.
 - Upgraded eslint-plugin-jsdoc to ^ 37.0.0.
 
+### Fixed
+- decrypt helper method to be able to handle multiple chunks.
+
+### Added
+- chunkSize tests for decrypt.
+
 ## 1.4.0 - 2020-08-20
 
 ### Changed
