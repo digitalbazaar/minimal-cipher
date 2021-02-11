@@ -72,9 +72,19 @@ describe('minimal-cipher', function() {
         return new Uint8Array(size).map(
           () => Math.floor(Math.random() * 255));
       }
-
-      async function encryptStream({data, queueSize = 5, chunkSize = 5}) {
-        const stream = new ReadableStream({
+      /**
+       * Creates a new unencrypted ReadableStream.
+       * This should act similar to a file stream in a browser.
+       *
+       * @param {object} options - Options to use.
+       * @param {Uint8Array} options.data - The data being streamed.
+       * @param {number} [options.queueSize = 5] - Determines how the data is
+       *   sliced and how many chunks are enqueued in the stream.
+       *
+       * @returns {ReadableStream} Returns a ReadableStream.
+       */
+      const createUnencryptedStream = ({data, queueSize = 5}) => {
+        return new ReadableStream({
           pull(controller) {
             // break the unit8Array into chunks using queueSize
             for(let i = 0; i < data.length; i += queueSize) {
@@ -84,9 +94,24 @@ describe('minimal-cipher', function() {
             controller.close();
           }
         });
+      };
+      /**
+       * Creates an encrypted stream from an unencrypted ReadableStream.
+       *
+       * @param {object} options - Options to use.
+       * @param {Uint8Array} options.data - The data for the stream.
+       * @param {number} [options.queueSize = 5] - How many chunks the
+       *   unencrypted stream should contain.
+       * @param {number} [options.chunkSize = 5] - The size of the chunks in the
+       *   encrypted stream.
+       *
+       * @returns {Promise<Array>} The resulting encrypted chunks.
+       */
+      async function encryptStream({data, queueSize = 5, chunkSize = 5}) {
+        const unencryptedStream = createUnencryptedStream({data, queueSize});
         const encryptStream = await cipher.createEncryptStream(
           {recipients, keyResolver, chunkSize});
-        const readable = stream.pipeThrough(encryptStream);
+        const readable = unencryptedStream.pipeThrough(encryptStream);
         const reader = readable.getReader();
         const chunks = [];
         let value;
@@ -105,6 +130,14 @@ describe('minimal-cipher', function() {
         return chunks;
       }
 
+      /**
+       * Takes in encrypted chunks and returns an unencrypted Uint8Array.
+       *
+       * @param {object} options - Options to use.
+       * @param {Array} options.chunks - An array of encrypted data.
+       *
+       * @returns {Promise<Uint8Array>} The unencrypted data.
+       */
       async function decryptStream({chunks}) {
         const stream = new ReadableStream({
           pull(controller) {
