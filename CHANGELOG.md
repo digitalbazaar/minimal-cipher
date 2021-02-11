@@ -7,7 +7,11 @@
 - Upgraded eslint-plugin-jsdoc to ^ 37.0.0.
 
 ### Fixed
-- decrypt helper method to be able to handle multiple chunks.
+- decrypt helper function in test suite to be able to handle multiple chunks.
+
+### Added
+- new helper function createUnencryptedStream in test suite.
+- better jsdoc comments to help clarify test suite functions.
 
 ### Added
 - chunkSize tests for decrypt.
