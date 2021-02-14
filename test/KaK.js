@@ -6,10 +6,11 @@
 const base58 = require('base58-universal');
 const nacl = require('tweetnacl');
 const {deriveSecret: dhDeriveSecret} = require('../algorithms/x25519');
+const {store} = require('./store');
 
 module.exports = class KaK {
-  constructor({keyPair} = {}) {
-    this.id = 'urn:123',
+  constructor({keyPair, id = 'urn:123'} = {}) {
+    this.id = id,
     this.type = 'X25519KeyAgreementKey2019';
     if(!keyPair) {
       keyPair = nacl.box.keyPair();
@@ -21,6 +22,14 @@ module.exports = class KaK {
       this.publicKey = base58.decode(keyPair.publicKeyBase58);
       this.publicKeyBase58 = keyPair.publicKeyBase58;
     }
+    const publicKeyNode = {
+      '@context': 'https://w3id.org/security/v2',
+      id: this.id,
+      type: this.type,
+      publicKeyBase58: this.publicKeyBase58
+    };
+
+    store.set(id, publicKeyNode);
   }
 
   async deriveSecret({publicKey}) {

@@ -8,6 +8,7 @@ const {Cipher} = require('../../');
 const {TextDecoder, ReadableStream} = require('../../util');
 const KaK = require('../KaK');
 const chaiCipher = require('../chai-cipher');
+const {store} = require('../store');
 
 chai.should();
 chai.use(chaiCipher);
@@ -49,20 +50,14 @@ describe('minimal-cipher', function() {
     describe(`${algorithm} algorithm`, function() {
 
       // each test inits data to null
-      let cipher, keyAgreementKey, publicKeyNode, recipients = null;
+      let cipher, keyAgreementKey, recipients = null;
 
       // keyResolver returns publicKeyNode
-      const keyResolver = async () => publicKeyNode;
+      const keyResolver = async ({id}) => store.get(id);
 
       beforeEach(async function() {
         cipher = new Cipher({version: algorithm});
-        keyAgreementKey = new KaK();
-        publicKeyNode = {
-          '@context': 'https://w3id.org/security/v2',
-          id: keyAgreementKey.id,
-          type: keyAgreementKey.type,
-          publicKeyBase58: keyAgreementKey.publicKeyBase58
-        };
+        keyAgreementKey = new KaK({id: 'urn:123'});
         recipients = [{
           header: {kid: keyAgreementKey.id, alg: 'ECDH-ES+A256KW'}
         }];
@@ -267,13 +262,10 @@ describe('minimal-cipher', function() {
       it('should decrypt a legacy-encrypted simple object', async function() {
         // decrypts `C20P` JWE (now replaced by `XC20P`)
         const jwe = LEGACY_JWE;
-        keyAgreementKey = new KaK({keyPair: LEGACY_KEY_PAIR});
-        publicKeyNode = {
-          '@context': 'https://w3id.org/security/v2',
-          id: keyAgreementKey.id,
-          type: keyAgreementKey.type,
-          publicKeyBase58: keyAgreementKey.publicKeyBase58
-        };
+        keyAgreementKey = new KaK({
+          keyPair: LEGACY_KEY_PAIR,
+          id: 'urn:123'
+        });
         const obj = {simple: true};
         jwe.should.be.a.JWE;
         const result = await cipher.decryptObject({jwe, keyAgreementKey});
