@@ -71,7 +71,7 @@ describe('minimal-cipher', function() {
        * @param {number} [options.chunkSize = 5] - The size of the chunks in the
        *   encrypted stream.
        * @param {Array<object>} [options.recipients=recipient] - A list of JWE
-       *   recipients.
+       *   JOSE recipients.
        *
        * @returns {Promise<Array>} The resulting encrypted chunks.
        */

@@ -22,16 +22,16 @@ module.exports = class KaK {
       this.publicKey = base58.decode(keyPair.publicKeyBase58);
       this.publicKeyBase58 = keyPair.publicKeyBase58;
     }
-    const publicKeyNode = {
+    store.set(id, this.publicKeyNode);
+  }
+  get publicKeyNode() {
+    return {
       '@context': 'https://w3id.org/security/v2',
       id: this.id,
       type: this.type,
       publicKeyBase58: this.publicKeyBase58
     };
-
-    store.set(id, publicKeyNode);
   }
-
   async deriveSecret({publicKey}) {
     const remotePublicKey = base58.decode(publicKey.publicKeyBase58);
     const {privateKey} = this;
