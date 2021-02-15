@@ -21,7 +21,7 @@ describe('minimal-cipher', function() {
     describe(`${algorithm} algorithm`, function() {
 
       // each test inits data to null
-      let cipher, keyAgreementKey, recipients = null;
+      let cipher, keyAgreementKey, recipient = null;
 
       // keyResolver returns publicKeyNode
       const keyResolver = async ({id}) => store.get(id);
@@ -29,7 +29,7 @@ describe('minimal-cipher', function() {
       beforeEach(async function() {
         cipher = new Cipher({version: algorithm});
         keyAgreementKey = new KaK({id: 'urn:123'});
-        recipients = [{
+        recipient = [{
           header: {kid: keyAgreementKey.id, alg: 'ECDH-ES+A256KW'}
         }];
       });
@@ -70,10 +70,17 @@ describe('minimal-cipher', function() {
        *   unencrypted stream should contain.
        * @param {number} [options.chunkSize = 5] - The size of the chunks in the
        *   encrypted stream.
+       * @param {Array<object>} [options.recipients=recipient] - A list of JWE
+       *   recipients.
        *
        * @returns {Promise<Array>} The resulting encrypted chunks.
        */
-      async function encryptStream({data, queueSize = 5, chunkSize = 5}) {
+      async function encryptStream({
+        data,
+        queueSize = 5,
+        chunkSize = 5,
+        recipients = recipient
+      }) {
         const unencryptedStream = createUnencryptedStream({data, queueSize});
         const encryptStream = await cipher.createEncryptStream(
           {recipients, keyResolver, chunkSize});
@@ -141,20 +148,20 @@ describe('minimal-cipher', function() {
 
       it('should encrypt a simple Uint8Array', async function() {
         const data = getRandomUint8();
-        const result = await cipher.encrypt({data, recipients, keyResolver});
+        const result = await cipher.encrypt({data, recipients: recipient, keyResolver});
         result.should.be.a.JWE;
       });
 
       it('should encrypt a simple string', async function() {
         const data = 'simple';
-        const result = await cipher.encrypt({data, recipients, keyResolver});
+        const result = await cipher.encrypt({data, recipients: recipient, keyResolver});
         result.should.be.a.JWE;
       });
 
       it('should encrypt a simple object', async function() {
         const obj = {simple: true};
         const result = await cipher.encryptObject(
-          {obj, recipients, keyResolver});
+          {obj, recipients: recipient, keyResolver});
         result.should.be.a.JWE;
       });
 
@@ -169,7 +176,7 @@ describe('minimal-cipher', function() {
 
       it('should decrypt an Uint8Array', async function() {
         const data = getRandomUint8();
-        const jwe = await cipher.encrypt({data, recipients, keyResolver});
+        const jwe = await cipher.encrypt({data, recipients: recipient, keyResolver});
         jwe.should.be.a.JWE;
         const result = await cipher.decrypt({jwe, keyAgreementKey});
         result.should.eql(data);
@@ -177,7 +184,7 @@ describe('minimal-cipher', function() {
 
       it('should decrypt a simple string', async function() {
         const data = 'simple';
-        const jwe = await cipher.encrypt({data, recipients, keyResolver});
+        const jwe = await cipher.encrypt({data, recipients: recipient, keyResolver});
         jwe.should.be.a.JWE;
         const result = await cipher.decrypt({jwe, keyAgreementKey});
         const resultString = new TextDecoder().decode(result);
@@ -187,7 +194,7 @@ describe('minimal-cipher', function() {
       it('should decrypt a simple object', async function() {
         const obj = {simple: true};
         const jwe = await cipher.encryptObject(
-          {obj, recipients, keyResolver});
+          {obj, recipients: recipient, keyResolver});
         jwe.should.be.a.JWE;
         const result = await cipher.decryptObject({jwe, keyAgreementKey});
         result.should.eql(obj);
