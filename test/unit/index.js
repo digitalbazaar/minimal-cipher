@@ -21,15 +21,15 @@ describe('minimal-cipher', function() {
     describe(`${algorithm} algorithm`, function() {
 
       // each test inits data to null
-      let cipher, keyAgreementKey, recipient = null;
+      let cipher, testKaK, recipient = null;
 
       // keyResolver returns publicKeyNode
       const keyResolver = async ({id}) => store.get(id);
 
       beforeEach(async function() {
         cipher = new Cipher({version: algorithm});
-        keyAgreementKey = new KaK({id: 'urn:123'});
-        recipient = [keyAgreementKey.recipient];
+        testKaK = new KaK({id: 'urn:123'});
+        recipient = [testKaK.recipient];
       });
 
       function getRandomUint8({size = 50} = {}) {
@@ -106,10 +106,11 @@ describe('minimal-cipher', function() {
        *
        * @param {object} options - Options to use.
        * @param {Array} options.chunks - An array of encrypted data.
+       * @param {KaK} options.keyAgreementKey - A KaK in the recipients.
        *
        * @returns {Promise<Uint8Array>} The unencrypted data.
        */
-      async function decryptStream({chunks}) {
+      async function decryptStream({chunks, keyAgreementKey = testKaK}) {
         const stream = new ReadableStream({
           pull(controller) {
             chunks.forEach(c => controller.enqueue(c));
@@ -210,7 +211,7 @@ describe('minimal-cipher', function() {
         });
         jwe.should.be.a.JWE;
         jwe.recipients.length.should.eql(1);
-        const result = await cipher.decrypt({jwe, keyAgreementKey});
+        const result = await cipher.decrypt({jwe, keyAgreementKey: testKaK});
         result.should.eql(data);
       });
 
@@ -223,7 +224,7 @@ describe('minimal-cipher', function() {
         });
         jwe.should.be.a.JWE;
         jwe.recipients.length.should.eql(1);
-        const result = await cipher.decrypt({jwe, keyAgreementKey});
+        const result = await cipher.decrypt({jwe, keyAgreementKey: testKaK});
         const resultString = new TextDecoder().decode(result);
         resultString.should.eql(data);
       });
@@ -234,7 +235,8 @@ describe('minimal-cipher', function() {
           {obj, recipients: recipient, keyResolver});
         jwe.should.be.a.JWE;
         jwe.recipients.length.should.eql(1);
-        const result = await cipher.decryptObject({jwe, keyAgreementKey});
+        const result = await cipher.decryptObject(
+          {jwe, keyAgreementKey: testKaK});
         result.should.eql(obj);
       });
 
@@ -281,14 +283,15 @@ describe('minimal-cipher', function() {
       it('should decrypt a legacy-encrypted simple object', async function() {
         // decrypts `C20P` JWE (now replaced by `XC20P`)
         const jwe = LEGACY_JWE;
-        keyAgreementKey = new KaK({
+        testKaK = new KaK({
           keyPair: LEGACY_KEY_PAIR,
           id: 'urn:123'
         });
         const obj = {simple: true};
         jwe.should.be.a.JWE;
         jwe.recipients.length.should.eql(1);
-        const result = await cipher.decryptObject({jwe, keyAgreementKey});
+        const result = await cipher.decryptObject(
+          {jwe, keyAgreementKey: testKaK});
         result.should.eql(obj);
       });
     });
