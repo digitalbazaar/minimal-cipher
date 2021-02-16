@@ -11,6 +11,7 @@ const {isJWE, isRecipient} = require('../chai-cipher');
 const {store} = require('../store');
 const {LEGACY_JWE, LEGACY_KEY_PAIR} = require('../mock-data');
 
+const should = chai.should();
 chai.use(isJWE);
 
 const cipherAlgorithms = ['recommended', 'fips'];
@@ -327,29 +328,6 @@ describe('minimal-cipher', function() {
         result.should.deep.eql(data);
       });
 
-      it('should decrypt a stream with multiple recipients',
-        async function() {
-          const data = getRandomUint8({size: 100});
-          const secondKaK = new KaK({id: 'urn:recipient2'});
-          const recipients = [...recipient, secondKaK.recipient];
-          const chunks = await encryptStream({data, chunkSize: 1, recipients});
-          chunks.length.should.eql(100);
-          for(const chunk of chunks) {
-            chunk.jwe.should.be.a.JWE;
-            chunk.jwe.recipients.length.should.eql(2);
-            isRecipient({recipients: chunk.jwe.recipients, kak: testKaK});
-            isRecipient({recipients: chunk.jwe.recipients, kak: secondKaK});
-          }
-          const result = await decryptStream(
-            {chunks, keyAgreementKey: testKaK});
-          result.length.should.eql(data.length);
-          result.should.deep.eql(data);
-          const result2 = await decryptStream(
-            {chunks, keyAgreementKey: secondKaK});
-          result2.length.should.eql(data.length);
-          result2.should.deep.eql(data);
-        });
-
       it('should decrypt a stream with chunkSize 5 bytes', async function() {
         const data = getRandomUint8({size: 100});
         const chunks = await encryptStream({data, chunkSize: 5});
@@ -378,6 +356,65 @@ describe('minimal-cipher', function() {
         result.length.should.eql(data.length);
         result.should.deep.eql(data);
       });
+
+      it('should decrypt a stream with multiple recipients',
+        async function() {
+          const data = getRandomUint8({size: 100});
+          const secondKaK = new KaK({id: 'urn:recipient2'});
+          const recipients = [...recipient, secondKaK.recipient];
+          const chunks = await encryptStream({data, chunkSize: 1, recipients});
+          chunks.length.should.eql(100);
+          for(const chunk of chunks) {
+            chunk.jwe.should.be.a.JWE;
+            chunk.jwe.recipients.length.should.eql(2);
+            isRecipient({recipients: chunk.jwe.recipients, kak: testKaK});
+            isRecipient({recipients: chunk.jwe.recipients, kak: secondKaK});
+          }
+          const result = await decryptStream(
+            {chunks, keyAgreementKey: testKaK});
+          result.length.should.eql(data.length);
+          result.should.deep.eql(data);
+          const result2 = await decryptStream(
+            {chunks, keyAgreementKey: secondKaK});
+          result2.length.should.eql(data.length);
+          result2.should.deep.eql(data);
+        });
+
+      it('should only decrypt stream if KaK matches a recipient',
+        async function() {
+          const data = getRandomUint8({size: 100});
+          const secondKaK = new KaK({id: 'urn:recipient2'});
+          const recipients = [...recipient, secondKaK.recipient];
+          const chunks = await encryptStream({data, chunkSize: 1, recipients});
+          chunks.length.should.eql(100);
+          for(const chunk of chunks) {
+            chunk.jwe.should.be.a.JWE;
+            chunk.jwe.recipients.length.should.eql(2);
+            isRecipient({recipients: chunk.jwe.recipients, kak: testKaK});
+            isRecipient({recipients: chunk.jwe.recipients, kak: secondKaK});
+            // remove the testKaK
+            chunk.jwe.recipients = chunk.jwe.recipients.filter(
+              r => r.header.kid != testKaK.id);
+          }
+          let error = null;
+          let result = null;
+          try {
+            // the testKaK should fail to decrypt
+            result = await decryptStream({chunks, keyAgreementKey: testKaK});
+          } catch(e) {
+            error = e;
+          }
+          should.not.exist(result);
+          should.exist(error);
+          error.should.be.an('Error');
+          error.message.should.equal(
+            'No matching recipient found for key agreement key.');
+          // the secondKaK should still be able to decrypt
+          result = await decryptStream(
+            {chunks, keyAgreementKey: secondKaK});
+          result.length.should.eql(data.length);
+          result.should.deep.eql(data);
+        });
 
       it('should decrypt a legacy-encrypted simple object', async function() {
         // decrypts `C20P` JWE (now replaced by `XC20P`)
