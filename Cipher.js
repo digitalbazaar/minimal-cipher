@@ -189,7 +189,9 @@ export class Cipher {
   }
 
   /**
-   * Creates a JOSE Header used as a JWE recipient.
+   * Creates a JOSE Header and encrypted_key for a recipient.
+   *
+   * @see https://tools.ietf.org/html/rfc7516#section-4
    *
    * @param {object} options - Options to use.
    * @param {object} options.recipient - A recipient with a header with a
@@ -197,11 +199,10 @@ export class Cipher {
    * @param {object} options.ephemeralKeyPair - An ephmerealKeyPair.
    * @param {object} options.cek - A content encryption key.
    * @param {Function} options.keyResolver - A function that can resolve keys.
-   * @see https://tools.ietf.org/html/rfc7516#section-4
    *
-   * @returns {Promise<Array<object>>} An array of JOSE headers.
+   * @returns {Promise<object>} A JWE recipient object.
    */
-  async createJOSEHeader({recipient, ephemeralKeyPair, cek, keyResolver}) {
+  async addRecipient({recipient, ephemeralKeyPair, cek, keyResolver}) {
     // ensure all recipients use the supported key agreement algorithm
     const {keyAgreement} = this;
     const staticPublicKey = await keyResolver({id: recipient.header.kid});
@@ -267,7 +268,7 @@ export class Cipher {
     const ephemeralKeyPair = await keyAgreement.deriveEphemeralKeyPair();
 
     recipients = await Promise.all(recipients.map(
-      recipient => this.createJOSEHeader(
+      recipient => this.addRecipient(
         {recipient, cek, ephemeralKeyPair, keyResolver})));
 
     // create shared protected header as associated authenticated data (aad)
