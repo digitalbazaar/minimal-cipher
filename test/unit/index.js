@@ -242,9 +242,29 @@ describe('minimal-cipher', function() {
         });
         jwe.should.be.a.JWE;
         jwe.recipients.length.should.eql(1);
+        isRecipient({recipients: jwe.recipients, kak: testKaK});
         const result = await cipher.decrypt({jwe, keyAgreementKey: testKaK});
         result.should.eql(data);
       });
+
+      it('should decrypt an Uint8Array with multiple recipients',
+        async function() {
+          const data = getRandomUint8();
+          const secondKaK = new KaK({id: 'urn:recipient2'});
+          const recipients = [...recipient, secondKaK.recipient];
+          const jwe = await cipher.encrypt({
+            data,
+            recipients,
+            keyResolver
+          });
+          jwe.should.be.a.JWE;
+          jwe.recipients.length.should.eql(2);
+          const result = await cipher.decrypt({jwe, keyAgreementKey: testKaK});
+          result.should.eql(data);
+          const result2 = await cipher.decrypt(
+            {jwe, keyAgreementKey: secondKaK});
+          result2.should.eql(data);
+        });
 
       it('should decrypt a simple string', async function() {
         const data = 'simple';
