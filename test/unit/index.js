@@ -173,6 +173,30 @@ describe('minimal-cipher', function() {
           isRecipient({recipients: result.recipients, kak: secondKaK});
         });
 
+      it('should fail if a recipient kid can not be resolved',
+        async function() {
+          const data = getRandomUint8();
+          const secondKaK = new KaK({id: 'urn:recipient2'});
+          const secondRecipient = {...secondKaK.recipient};
+          secondRecipient.header.kid = 'urn:not-found';
+          const recipients = [...recipient, secondRecipient];
+          let error = null;
+          let result = null;
+          try {
+            result = await cipher.encrypt({
+              data,
+              recipients,
+              keyResolver
+            });
+          } catch(e) {
+            error = e;
+          }
+          should.not.exist(result);
+          should.exist(error);
+          error.should.be.an('Error');
+          error.message.should.equal('"staticPublicKey" required.');
+        });
+
       it('should encrypt a simple string', async function() {
         const data = 'simple';
         const result = await cipher.encrypt({
