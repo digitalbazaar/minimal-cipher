@@ -189,6 +189,45 @@ export class Cipher {
   }
 
   /**
+   * Creates a JOSE Header used as a JWE recipient.
+   *
+   * @param {object} options - Options to use.
+   * @param {object} options.recipient - A recipient with a header with a
+   *   kid and alg.
+   * @param {object} options.ephemeralKeyPair - An ephmerealKeyPair.
+   * @param {object} options.cek - A content encryption key.
+   * @param {Function} options.keyResolver - A function that can resolve keys.
+   * @see https://tools.ietf.org/html/rfc7516#section-4
+   *
+   * @returns {Promise<Array<object>>} An array of JOSE headers.
+   */
+  async createJOSEHeader({recipient, ephemeralKeyPair, cek, keyResolver}) {
+    // ensure all recipients use the supported key agreement algorithm
+    const {keyAgreement} = this;
+    const staticPublicKey = await keyResolver({id: recipient.header.kid});
+    // derive KEKs for each recipient
+    const derivedResult = await keyAgreement.kekFromStaticPeer(
+      {ephemeralKeyPair, staticPublicKey});
+    const {kek, epk, apu, apv} = derivedResult;
+    const header = {
+      // contains the key id - kid
+      // contains the algorithm - alg
+      ...recipient.header,
+      // the ephemeralKeyPair
+      epk,
+      // base64 encoded ephemeralKeyPair's publicKey
+      apu,
+      // base64 encoded staticPublicKey's id
+      apv,
+    };
+    return {
+      header,
+      // the cek is wrapped so the recipient can use it to decrypt later
+      encrypted_key: await kek.wrapKey({unwrappedKey: cek})
+    };
+  }
+
+  /**
    * Creates an EncryptTransformer that can be used to encrypt one or more
    * chunks of data.
    *
@@ -224,28 +263,12 @@ export class Cipher {
     // generate a CEK for encrypting the content
     const cek = await cipher.generateKey();
 
-    // fetch all public DH keys
-    const publicKeys = await Promise.all(
-      recipients.map(e => keyResolver({id: e.header.kid})));
-
     // derive ephemeral ECDH key pair to use with all recipients
     const ephemeralKeyPair = await keyAgreement.deriveEphemeralKeyPair();
 
-    // derive KEKs for each recipient
-    const derivedResults = await Promise.all(
-      publicKeys.map(
-        staticPublicKey => keyAgreement.kekFromStaticPeer(
-          {ephemeralKeyPair, staticPublicKey})));
-
-    // update all recipients with ephemeral ECDH key and wrapped CEK
-    await Promise.all(recipients.map(async (recipient, i) => {
-      const {kek, epk, apu, apv} = derivedResults[i];
-      recipients[i] = recipient = {header: {...recipient.header}};
-      recipient.header.epk = epk;
-      recipient.header.apu = apu;
-      recipient.header.apv = apv;
-      recipient.encrypted_key = await kek.wrapKey({unwrappedKey: cek});
-    }));
+    recipients = await Promise.all(recipients.map(
+      recipient => this.createJOSEHeader(
+        {recipient, cek, ephemeralKeyPair, keyResolver})));
 
     // create shared protected header as associated authenticated data (aad)
     // ASCII(BASE64URL(UTF8(JWE Protected Header)))
