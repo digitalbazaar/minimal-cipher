@@ -196,7 +196,7 @@ export class Cipher {
    * @param {object} options - Options to use.
    * @param {object} options.recipient - A recipient with a header with a
    *   kid and alg.
-   * @param {object} options.ephemeralKeyPair - An ephmerealKeyPair.
+   * @param {object} options.ephemeralKeyPair - An ephemeral key pair.
    * @param {object} options.cek - A content encryption key.
    * @param {Function} options.keyResolver - A function that can resolve keys.
    *
