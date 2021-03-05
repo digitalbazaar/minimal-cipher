@@ -53,7 +53,7 @@ export async function kekFromEphemeralPeer({keyAgreementKey, epk}) {
 // static key
 export async function kekFromStaticPeer({ephemeralKeyPair, staticPublicKey}) {
   if(!staticPublicKey) {
-    throw new Error('"staticPublicKey" required.');
+    throw new Error('"staticPublicKey" is required.');
   }
   const {privateKey} = ephemeralKeyPair;
   // TODO: consider accepting JWK format for `staticPublicKey` not just LD key
