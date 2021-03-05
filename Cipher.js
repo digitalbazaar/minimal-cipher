@@ -234,6 +234,7 @@ export class Cipher {
       apv,
     };
     return {
+      ...recipient,
       header,
       // the cek is wrapped so the recipient can use it to decrypt later
       encrypted_key: await kek.wrapKey({unwrappedKey: cek})
