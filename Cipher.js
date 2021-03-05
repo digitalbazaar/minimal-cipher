@@ -203,7 +203,7 @@ export class Cipher {
    * @returns {Promise<object>} A JWE recipient object.
    */
   async addRecipient({recipient, ephemeralKeyPair, cek, keyResolver}) {
-    // ensure all recipients use the supported key agreement algorithm
+    // resolve public DH key for recipient
     const {keyAgreement} = this;
     const staticPublicKey = await keyResolver({id: recipient.header.kid});
     // derive KEKs for each recipient
