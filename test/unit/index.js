@@ -153,7 +153,7 @@ describe('minimal-cipher', function() {
           keyResolver
         });
         result.should.be.a.JWE;
-        result.recipients.length.should.eql(1);
+        result.recipients.length.should.equal(1);
         isRecipient({recipients: result.recipients, kak: testKaK});
       });
 
@@ -168,7 +168,7 @@ describe('minimal-cipher', function() {
             keyResolver
           });
           result.should.be.a.JWE;
-          result.recipients.length.should.eql(2);
+          result.recipients.length.should.equal(2);
           isRecipient({recipients: result.recipients, kak: testKaK});
           isRecipient({recipients: result.recipients, kak: secondKaK});
         });
@@ -194,7 +194,7 @@ describe('minimal-cipher', function() {
           should.not.exist(result);
           should.exist(error);
           error.should.be.an('Error');
-          error.message.should.equal('"staticPublicKey" required.');
+          error.message.should.equal('"staticPublicKey" is required.');
         });
 
       it('should encrypt a simple string', async function() {
@@ -205,7 +205,7 @@ describe('minimal-cipher', function() {
           keyResolver
         });
         result.should.be.a.JWE;
-        result.recipients.length.should.eql(1);
+        result.recipients.length.should.equal(1);
         isRecipient({recipients: result.recipients, kak: testKaK});
       });
 
@@ -214,7 +214,7 @@ describe('minimal-cipher', function() {
         const result = await cipher.encryptObject(
           {obj, recipients: recipient, keyResolver});
         result.should.be.a.JWE;
-        result.recipients.length.should.eql(1);
+        result.recipients.length.should.equal(1);
         isRecipient({recipients: result.recipients, kak: testKaK});
       });
 
@@ -226,7 +226,7 @@ describe('minimal-cipher', function() {
           const result = await cipher.encryptObject(
             {obj, recipients, keyResolver});
           result.should.be.a.JWE;
-          result.recipients.length.should.eql(2);
+          result.recipients.length.should.equal(2);
           isRecipient({recipients: result.recipients, kak: testKaK});
           isRecipient({recipients: result.recipients, kak: secondKaK});
         });
@@ -237,7 +237,7 @@ describe('minimal-cipher', function() {
         chunks.length.should.be.gte(0);
         for(const chunk of chunks) {
           chunk.jwe.should.be.a.JWE;
-          chunk.jwe.recipients.length.should.eql(1);
+          chunk.jwe.recipients.length.should.equal(1);
           isRecipient({recipients: chunk.jwe.recipients, kak: testKaK});
         }
       });
@@ -251,7 +251,7 @@ describe('minimal-cipher', function() {
           chunks.length.should.be.gte(0);
           for(const chunk of chunks) {
             chunk.jwe.should.be.a.JWE;
-            chunk.jwe.recipients.length.should.eql(2);
+            chunk.jwe.recipients.length.should.equal(2);
             isRecipient({recipients: chunk.jwe.recipients, kak: testKaK});
             isRecipient({recipients: chunk.jwe.recipients, kak: secondKaK});
           }
@@ -265,7 +265,7 @@ describe('minimal-cipher', function() {
           keyResolver
         });
         jwe.should.be.a.JWE;
-        jwe.recipients.length.should.eql(1);
+        jwe.recipients.length.should.equal(1);
         isRecipient({recipients: jwe.recipients, kak: testKaK});
         const result = await cipher.decrypt({jwe, keyAgreementKey: testKaK});
         result.should.eql(data);
@@ -282,7 +282,7 @@ describe('minimal-cipher', function() {
             keyResolver
           });
           jwe.should.be.a.JWE;
-          jwe.recipients.length.should.eql(2);
+          jwe.recipients.length.should.equal(2);
           isRecipient({recipients: jwe.recipients, kak: testKaK});
           isRecipient({recipients: jwe.recipients, kak: secondKaK});
           const result = await cipher.decrypt({jwe, keyAgreementKey: testKaK});
@@ -300,7 +300,7 @@ describe('minimal-cipher', function() {
           keyResolver
         });
         jwe.should.be.a.JWE;
-        jwe.recipients.length.should.eql(1);
+        jwe.recipients.length.should.equal(1);
         isRecipient({recipients: jwe.recipients, kak: testKaK});
         const result = await cipher.decrypt({jwe, keyAgreementKey: testKaK});
         const resultString = new TextDecoder().decode(result);
@@ -312,7 +312,7 @@ describe('minimal-cipher', function() {
         const jwe = await cipher.encryptObject(
           {obj, recipients: recipient, keyResolver});
         jwe.should.be.a.JWE;
-        jwe.recipients.length.should.eql(1);
+        jwe.recipients.length.should.equal(1);
         isRecipient({recipients: jwe.recipients, kak: testKaK});
         const result = await cipher.decryptObject(
           {jwe, keyAgreementKey: testKaK});
@@ -327,7 +327,7 @@ describe('minimal-cipher', function() {
           const jwe = await cipher.encryptObject(
             {obj, recipients, keyResolver});
           jwe.should.be.a.JWE;
-          jwe.recipients.length.should.eql(2);
+          jwe.recipients.length.should.equal(2);
           isRecipient({recipients: jwe.recipients, kak: testKaK});
           isRecipient({recipients: jwe.recipients, kak: secondKaK});
           const result = await cipher.decryptObject(
@@ -341,28 +341,28 @@ describe('minimal-cipher', function() {
       it('should decrypt a stream with chunkSize 1 byte', async function() {
         const data = getRandomUint8({size: 100});
         const chunks = await encryptStream({data, chunkSize: 1});
-        chunks.length.should.eql(100);
+        chunks.length.should.equal(100);
         for(const chunk of chunks) {
           chunk.jwe.should.be.a.JWE;
-          chunk.jwe.recipients.length.should.eql(1);
+          chunk.jwe.recipients.length.should.equal(1);
           isRecipient({recipients: chunk.jwe.recipients, kak: testKaK});
         }
         const result = await decryptStream({chunks});
-        result.length.should.eql(data.length);
+        result.length.should.equal(data.length);
         result.should.deep.eql(data);
       });
 
       it('should decrypt a stream with chunkSize 5 bytes', async function() {
         const data = getRandomUint8({size: 100});
         const chunks = await encryptStream({data, chunkSize: 5});
-        chunks.length.should.eql(20);
+        chunks.length.should.equal(20);
         for(const chunk of chunks) {
           chunk.jwe.should.be.a.JWE;
-          chunk.jwe.recipients.length.should.eql(1);
+          chunk.jwe.recipients.length.should.equal(1);
           isRecipient({recipients: chunk.jwe.recipients, kak: testKaK});
         }
         const result = await decryptStream({chunks});
-        result.length.should.eql(data.length);
+        result.length.should.equal(data.length);
         result.should.deep.eql(data);
       });
 
@@ -370,14 +370,14 @@ describe('minimal-cipher', function() {
         const data = getRandomUint8({size: 100});
         const chunks = await encryptStream(
           {data, chunkSize: 1048576, queueSize: 1});
-        chunks.length.should.eql(1);
+        chunks.length.should.equal(1);
         for(const chunk of chunks) {
           chunk.jwe.should.be.a.JWE;
-          chunk.jwe.recipients.length.should.eql(1);
+          chunk.jwe.recipients.length.should.equal(1);
           isRecipient({recipients: chunk.jwe.recipients, kak: testKaK});
         }
         const result = await decryptStream({chunks});
-        result.length.should.eql(data.length);
+        result.length.should.equal(data.length);
         result.should.deep.eql(data);
       });
 
@@ -387,20 +387,20 @@ describe('minimal-cipher', function() {
           const secondKaK = new KaK({id: 'urn:recipient2'});
           const recipients = [...recipient, secondKaK.recipient];
           const chunks = await encryptStream({data, chunkSize: 1, recipients});
-          chunks.length.should.eql(100);
+          chunks.length.should.equal(100);
           for(const chunk of chunks) {
             chunk.jwe.should.be.a.JWE;
-            chunk.jwe.recipients.length.should.eql(2);
+            chunk.jwe.recipients.length.should.equal(2);
             isRecipient({recipients: chunk.jwe.recipients, kak: testKaK});
             isRecipient({recipients: chunk.jwe.recipients, kak: secondKaK});
           }
           const result = await decryptStream(
             {chunks, keyAgreementKey: testKaK});
-          result.length.should.eql(data.length);
+          result.length.should.equal(data.length);
           result.should.deep.eql(data);
           const result2 = await decryptStream(
             {chunks, keyAgreementKey: secondKaK});
-          result2.length.should.eql(data.length);
+          result2.length.should.equal(data.length);
           result2.should.deep.eql(data);
         });
 
@@ -410,10 +410,10 @@ describe('minimal-cipher', function() {
           const secondKaK = new KaK({id: 'urn:recipient2'});
           const recipients = [...recipient, secondKaK.recipient];
           const chunks = await encryptStream({data, chunkSize: 1, recipients});
-          chunks.length.should.eql(100);
+          chunks.length.should.equal(100);
           for(const chunk of chunks) {
             chunk.jwe.should.be.a.JWE;
-            chunk.jwe.recipients.length.should.eql(2);
+            chunk.jwe.recipients.length.should.equal(2);
             isRecipient({recipients: chunk.jwe.recipients, kak: testKaK});
             isRecipient({recipients: chunk.jwe.recipients, kak: secondKaK});
             // remove the testKaK
@@ -436,7 +436,7 @@ describe('minimal-cipher', function() {
           // the secondKaK should still be able to decrypt
           result = await decryptStream(
             {chunks, keyAgreementKey: secondKaK});
-          result.length.should.eql(data.length);
+          result.length.should.equal(data.length);
           result.should.deep.eql(data);
         });
 
@@ -449,7 +449,7 @@ describe('minimal-cipher', function() {
         });
         const obj = {simple: true};
         jwe.should.be.a.JWE;
-        jwe.recipients.length.should.eql(1);
+        jwe.recipients.length.should.equal(1);
         isRecipient({recipients: jwe.recipients, kak: testKaK});
         const result = await cipher.decryptObject(
           {jwe, keyAgreementKey: testKaK});

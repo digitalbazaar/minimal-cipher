@@ -203,6 +203,18 @@ export class Cipher {
    * @returns {Promise<object>} A JWE recipient object.
    */
   async addRecipient({recipient, ephemeralKeyPair, cek, keyResolver}) {
+    if(!recipient) {
+      throw new TypeError('"options.recipient" is required.');
+    }
+    if(!ephemeralKeyPair) {
+      throw new TypeError('"options.ephemeralKeyPair" is required.');
+    }
+    if(!cek) {
+      throw new TypeError('"options.cek" is required.');
+    }
+    if(!keyResolver) {
+      throw new TypeError('"options.keyResolver" is required.');
+    }
     // resolve public DH key for recipient
     const {keyAgreement} = this;
     const staticPublicKey = await keyResolver({id: recipient.header.kid});
