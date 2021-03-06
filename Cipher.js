@@ -202,7 +202,7 @@ export class Cipher {
    *
    * @returns {Promise<object>} A JWE recipient object.
    */
-  async addRecipient({recipient, ephemeralKeyPair, cek, keyResolver}) {
+  async createRecipient({recipient, ephemeralKeyPair, cek, keyResolver}) {
     if(!recipient) {
       throw new TypeError('"options.recipient" is required.');
     }
