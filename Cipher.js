@@ -281,7 +281,7 @@ export class Cipher {
     const ephemeralKeyPair = await keyAgreement.deriveEphemeralKeyPair();
 
     recipients = await Promise.all(recipients.map(
-      recipient => this.addRecipient(
+      recipient => this.createRecipient(
         {recipient, cek, ephemeralKeyPair, keyResolver})));
 
     // create shared protected header as associated authenticated data (aad)
