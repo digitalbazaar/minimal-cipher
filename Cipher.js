@@ -189,7 +189,7 @@ export class Cipher {
   }
 
   /**
-   * Creates a JOSE Header and encrypted_key for a recipient.
+   * Creates a JWE recipient using the given inputs.
    *
    * @see https://tools.ietf.org/html/rfc7516#section-4
    *
