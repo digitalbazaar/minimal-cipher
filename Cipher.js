@@ -1,5 +1,5 @@
 /*!
- * Copyright (c) 2019-2020 Digital Bazaar, Inc. All rights reserved.
+ * Copyright (c) 2019-2021 Digital Bazaar, Inc. All rights reserved.
  */
 import base64url from 'base64url-universal';
 import {TextDecoder, TransformStream, stringToUint8Array} from './util.js';
@@ -189,59 +189,6 @@ export class Cipher {
   }
 
   /**
-   * Creates a JWE recipient using the given inputs.
-   *
-   * @see https://tools.ietf.org/html/rfc7516#section-4
-   *
-   * @param {object} options - Options to use.
-   * @param {object} options.recipient - A recipient with a header with a
-   *   kid and alg.
-   * @param {object} options.ephemeralKeyPair - An ephemeral key pair.
-   * @param {object} options.cek - A content encryption key.
-   * @param {Function} options.keyResolver - A function that can resolve keys.
-   *
-   * @returns {Promise<object>} A JWE recipient object.
-   */
-  async createRecipient({recipient, ephemeralKeyPair, cek, keyResolver}) {
-    if(!recipient) {
-      throw new TypeError('"options.recipient" is required.');
-    }
-    if(!ephemeralKeyPair) {
-      throw new TypeError('"options.ephemeralKeyPair" is required.');
-    }
-    if(!cek) {
-      throw new TypeError('"options.cek" is required.');
-    }
-    if(!keyResolver) {
-      throw new TypeError('"options.keyResolver" is required.');
-    }
-    // resolve public DH key for recipient
-    const {keyAgreement} = this;
-    const staticPublicKey = await keyResolver({id: recipient.header.kid});
-    // derive KEKs for each recipient
-    const derivedResult = await keyAgreement.kekFromStaticPeer(
-      {ephemeralKeyPair, staticPublicKey});
-    const {kek, epk, apu, apv} = derivedResult;
-    const header = {
-      // contains the key id - kid
-      // contains the algorithm - alg
-      ...recipient.header,
-      // the ephemeralKeyPair
-      epk,
-      // base64 encoded ephemeralKeyPair's publicKey
-      apu,
-      // base64 encoded staticPublicKey's id
-      apv,
-    };
-    return {
-      ...recipient,
-      header,
-      // the cek is wrapped so the recipient can use it to decrypt later
-      encrypted_key: await kek.wrapKey({unwrappedKey: cek})
-    };
-  }
-
-  /**
    * Creates an EncryptTransformer that can be used to encrypt one or more
    * chunks of data.
    *
@@ -281,7 +228,7 @@ export class Cipher {
     const ephemeralKeyPair = await keyAgreement.deriveEphemeralKeyPair();
 
     recipients = await Promise.all(recipients.map(
-      recipient => this.createRecipient(
+      recipient => this._createRecipient(
         {recipient, cek, ephemeralKeyPair, keyResolver})));
 
     // create shared protected header as associated authenticated data (aad)
@@ -317,5 +264,58 @@ export class Cipher {
       keyAgreement: this.keyAgreement,
       keyAgreementKey
     });
+  }
+
+  /**
+   * Creates a JWE recipient using the given inputs.
+   *
+   * @see https://tools.ietf.org/html/rfc7516#section-4
+   *
+   * @param {object} options - Options to use.
+   * @param {object} options.recipient - A recipient with a header with a
+   *   kid and alg.
+   * @param {object} options.ephemeralKeyPair - An ephemeral key pair.
+   * @param {object} options.cek - A content encryption key.
+   * @param {Function} options.keyResolver - A function that can resolve keys.
+   *
+   * @returns {Promise<object>} A JWE recipient object.
+   */
+  async _createRecipient({recipient, ephemeralKeyPair, cek, keyResolver}) {
+    if(!recipient) {
+      throw new TypeError('"options.recipient" is required.');
+    }
+    if(!ephemeralKeyPair) {
+      throw new TypeError('"options.ephemeralKeyPair" is required.');
+    }
+    if(!cek) {
+      throw new TypeError('"options.cek" is required.');
+    }
+    if(!keyResolver) {
+      throw new TypeError('"options.keyResolver" is required.');
+    }
+    // resolve public DH key for recipient
+    const {keyAgreement} = this;
+    const staticPublicKey = await keyResolver({id: recipient.header.kid});
+    // derive KEKs for each recipient
+    const derivedResult = await keyAgreement.kekFromStaticPeer(
+      {ephemeralKeyPair, staticPublicKey});
+    const {kek, epk, apu, apv} = derivedResult;
+    const header = {
+      // contains the key id - kid
+      // contains the algorithm - alg
+      ...recipient.header,
+      // the ephemeralKeyPair
+      epk,
+      // base64 encoded ephemeralKeyPair's publicKey
+      apu,
+      // base64 encoded staticPublicKey's id
+      apv,
+    };
+    return {
+      ...recipient,
+      header,
+      // the cek is wrapped so the recipient can use it to decrypt later
+      encrypted_key: await kek.wrapKey({unwrappedKey: cek})
+    };
   }
 }
