@@ -1,7 +1,7 @@
 {
-  "name": "minimal-cipher",
+  "name": "@digitalbazaar/minimal-cipher",
   "version": "1.4.2-0",
-  "description": "Minimal encryption/decryption JWE/CWE library",
+  "description": "Minimal encryption/decryption JWE/CWE library.",
   "license": "BSD-3-Clause",
   "main": "index.js",
   "scripts": {

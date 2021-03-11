@@ -20,7 +20,7 @@
 ### Changed
 - JSDOC comments in `Cipher.js`.
 - Upgraded eslint to ^7.0.0.
-- Upgraded eslint-plugin-jsdoc to ^ 37.0.0.
+- Upgraded eslint-plugin-jsdoc to ^37.0.0.
 - Refactored creating recipients.
 
 ### Fixed
@@ -29,8 +29,6 @@
 ### Added
 - new helper function createUnencryptedStream in test suite.
 - better jsdoc comments to help clarify test suite functions.
-
-### Added
 - chunkSize tests for decrypt.
 
 ## 1.4.0 - 2020-08-20

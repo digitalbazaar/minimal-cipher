@@ -57,7 +57,7 @@ npm install
 Pick a Cipher interface (`recommended` or `fips`) and create an instance:
 
 ```js
-const {Cipher} = require('minimal-cipher');
+const {Cipher} = require('@digitalbazaar/minimal-cipher');
 
 const cipher = new Cipher(); // by default {version: 'recommended'}
 ```
