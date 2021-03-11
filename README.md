@@ -42,7 +42,7 @@ APIs, including Web KMS (TODO: citation needed).
 
 ## Install
 
-- Node.js 8.3+ required.
+- Node.js 12+ required.
 
 To install locally (for development):
 
