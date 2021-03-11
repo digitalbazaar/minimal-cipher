@@ -1,6 +1,6 @@
 {
   "name": "minimal-cipher",
-  "version": "1.4.1-0",
+  "version": "1.4.1",
   "description": "Minimal encryption/decryption JWE/CWE library",
   "license": "BSD-3-Clause",
   "main": "index.js",
