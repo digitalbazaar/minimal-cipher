@@ -83,19 +83,20 @@ public/private key pairs that will be used to encrypt/decrypt the message):
 const keyAgreementKey = await fetchFromSomewhere();
 
 // or derive them from an existing Ed25519 signing key
-const X25519KeyPair = require('x25519-key-pair');
-const {Ed25519KeyPair} = require('crypto-ld');
-const edKeyPair = await Ed25519KeyPair.generate();
-const keyAgreementKey = X25519KeyPair.fromEdKeyPair(edKeyPair);
-// Don't forget to set your key's id. For example, DID + fingerprint
+const {X25519KeyAgreementKey2019} = require('@digitalbazaar/x25519-key-agreement-key-2019');
+import {Ed25519VerificationKey2020} from '@digitalbazaar/ed25519-verification-key-2020';
+const keyPair = await Ed25519VerificationKey2020.generate();
+
+const keyAgreementKey = X25519KeyPair.fromEd25519VerificationKey2020({keyPair});
+// If the source key pair didn't have a controller set, don't forget to set one:
+keyAgreementKey.controller = did; // The controller's DID
 keyAgreementKey.id = `${did}#${keyAgreementKey.fingerprint()}`;
 
 // or derive them from an authentication key extracted from DID Document 
 const didDoc = await veresDriver.get({did});
 const authnKey = didDoc.getVerificationMethod({proofPurpose: 'authentication'});
-const edKeyPair = await Ed25519KeyPair.from(authnKey);
-const keyAgreementKey = X25519KeyPair.fromEdKeyPair(edKeyPair);
-keyAgreementKey.id = authnKey.id;
+const edKeyPair = await Ed25519VerificationKey2020.from(authnKey);
+const keyPair = X25519KeyPair.fromEd25519VerificationKey2020({keyPair});
 
 const recipient = {
   header: {
@@ -128,9 +129,9 @@ const keyResolver = async () => publicKeyNode;
 // A more advanced resolver based on DID doc authentication keys
 const keyResolver = async ({id}) => {
   // Use veres driver to fetch the authn key directly
-  const authKeyPair = await Ed25519KeyPair.from(await veresDriver.get({did: id}));
+  const keyPair = await Ed25519VerificationKey2020.from(await veresDriver.get({did: id}));
   // Convert authn key to key agreement key
-  return X25519KeyPair.fromEdKeyPair(authKeyPair);
+  return X25519KeyPair.fromEd25519VerificationKey2020({keyPair});
 }
 ```
 

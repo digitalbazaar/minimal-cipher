@@ -15,6 +15,10 @@
   (Should be no changes that affect this lib.)
 
 ### Purpose and Upgrade Instructions
+There no API changes to `minimal-cipher` itself, so upgrading from `1.4.x` to
+`2.0.0` only involves making sure that the keys being used for key agreement
+are generated using the newer `crypto-ld` v4 method (see `minimal-cipher` README
+for examples).
 
 ## 1.4.1 - 2021-03-11
 ### Changed
