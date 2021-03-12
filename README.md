@@ -1,4 +1,4 @@
-# Minimal Cipher _(minimal-cipher)_
+# Minimal Cipher _(@digitalbazaar/minimal-cipher)_
 
 > Minimal encryption/decryption [JWE](https://tools.ietf.org/html/rfc7516)/[CWE](https://tools.ietf.org/html/rfc8152) library, secure algs only, browser-compatible
 
@@ -175,7 +175,7 @@ See [the contribute file](https://github.com/digitalbazaar/bedrock/blob/master/C
 
 PRs accepted.
 
-Small note: If editing the README, please conform to the
+If editing the README, please conform to the
 [standard-readme](https://github.com/RichardLitt/standard-readme) specification.
 
 ## Commercial Support
