@@ -167,7 +167,7 @@ const object = await cipher.decryptObject({jwe, keyAgreementKey});
 ```
 
 TODO: Describe the required KEK API:
-// `id`, `algorithm`, `wrapKey({unwrappedKey})`, and `unwrakKey({wrappedKey})`
+// `id`, `algorithm`, `wrapKey({unwrappedKey})`, and `unwrapKey({wrappedKey})`
 
 ## Contribute
 
