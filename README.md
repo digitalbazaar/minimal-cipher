@@ -83,7 +83,7 @@ public/private key pairs that will be used to encrypt/decrypt the message):
 const keyAgreementKey = await fetchFromSomewhere();
 
 // or derive them from an existing Ed25519 signing key
-const {X25519KeyAgreementKey2019} = require('@digitalbazaar/x25519-key-agreement-key-2019');
+import {X25519KeyAgreementKey2019} from '@digitalbazaar/x25519-key-agreement-key-2019';
 import {Ed25519VerificationKey2020} from '@digitalbazaar/ed25519-verification-key-2020';
 const keyPair = await Ed25519VerificationKey2020.generate();
 
