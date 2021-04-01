@@ -32,7 +32,7 @@ version and 256-bit "AES-GCM" as the FIPS-compliant version.
 
 Note: XSalsa20-Poly1305 is an AE (Authenticated Encryption) algorithm, not
 an AEAD (Authenticated Encryption and Associated Data) algorithm, making it
-incompatible with the current requirements for a 
+incompatible with the current requirements for a
 [JWE (JOSE Web Encryption)](https://tools.ietf.org/html/rfc7516)
 `protected` clear text header.
 
@@ -64,7 +64,7 @@ const cipher = new Cipher(); // by default {version: 'recommended'}
 
 ### Encrypting
 
-To encrypt something (to create a cipher, serialized as a JWE JSON document), 
+To encrypt something (to create a cipher, serialized as a JWE JSON document),
 you will need:
 
 * Some data to encrypt (a string, an object, a stream)
@@ -72,7 +72,7 @@ you will need:
 
 (You'll also need a `keyResolver`, more about that later.)
 
-First, assemble your Key Agreement public keys (you'll be encrypting with them, 
+First, assemble your Key Agreement public keys (you'll be encrypting with them,
 and the intended recipient will use the corresponding private keys to decrypt).
 
 Put together a list of `recipients` (essentially, you're listing the `id`s of
@@ -83,7 +83,7 @@ public/private key pairs that will be used to encrypt/decrypt the message):
 const keyAgreementKey = await fetchFromSomewhere();
 
 // or derive them from an existing Ed25519 signing key
-import {X25519KeyAgreementKey2019} from '@digitalbazaar/x25519-key-agreement-key-2019';
+import {X25519KeyAgreementKey2020} from '@digitalbazaar/x25519-key-agreement-key-2020';
 import {Ed25519VerificationKey2020} from '@digitalbazaar/ed25519-verification-key-2020';
 const keyPair = await Ed25519VerificationKey2020.generate();
 
@@ -92,7 +92,7 @@ const keyAgreementKey = X25519KeyPair.fromEd25519VerificationKey2020({keyPair});
 keyAgreementKey.controller = did; // The controller's DID
 keyAgreementKey.id = `${did}#${keyAgreementKey.fingerprint()}`;
 
-// or derive them from an authentication key extracted from DID Document 
+// or derive them from an authentication key extracted from DID Document
 const didDoc = await veresDriver.get({did});
 const authnKey = didDoc.getVerificationMethod({proofPurpose: 'authentication'});
 const edKeyPair = await Ed25519VerificationKey2020.from(authnKey);
@@ -117,12 +117,12 @@ Some example resolvers:
 ```js
 // Basic hardcoded key resolver; you already have the key material
 const publicKeyNode = {
-  '@context': 'https://w3id.org/security/v2',
+  '@context': 'https://w3id.org/security/suites/x25519-2020/v1',
   id: keyAgreementKey.id,
-  type: 'X25519KeyAgreementKey2019',
-  publicKeyBase58: keyAgreementKey.publicKeyBase58
+  type: 'X25519KeyAgreementKey2020',
+  publicKeyMultibase: keyAgreementKey.publicKeyMultibase
 };
-const keyResolver = async () => publicKeyNode; 
+const keyResolver = async () => publicKeyNode;
 ```
 
 ```js

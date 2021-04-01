@@ -8,7 +8,7 @@ import {deriveKey} from './ecdhkdf.js';
 import {TextEncoder} from '../util.js';
 import {deriveSecret, deriveEphemeralKeyPair} from './x25519-helper.js';
 
-const KEY_TYPE = 'X25519KeyAgreementKey2019';
+const KEY_TYPE = 'X25519KeyAgreementKey2020';
 
 export const JWE_ALG = 'ECDH-ES+A256KW';
 export {deriveEphemeralKeyPair, deriveSecret};
@@ -31,7 +31,7 @@ export async function kekFromEphemeralPeer({keyAgreementKey, epk}) {
   // convert to LD key for Web KMS
   const ephemeralPublicKey = {
     type: KEY_TYPE,
-    publicKeyBase58: base58.encode(publicKey)
+    publicKeyMultibase: `z${base58.encode(publicKey)}`
   };
 
   // safe to use IDs like in rfc7518 or does
@@ -61,7 +61,8 @@ export async function kekFromStaticPeer({ephemeralKeyPair, staticPublicKey}) {
     throw new Error(
       `"staticPublicKey.type" must be "${KEY_TYPE}".`);
   }
-  const remotePublicKey = base58.decode(staticPublicKey.publicKeyBase58);
+  const publicKeyBase58 = staticPublicKey.publicKeyMultibase.slice(1);
+  const remotePublicKey = base58.decode(publicKeyBase58);
 
   const encoder = new TextEncoder();
   // "Party U Info"

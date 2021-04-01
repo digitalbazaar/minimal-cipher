@@ -1,16 +1,21 @@
 # minimal-cipher ChangeLog
 
+## 3.0.0 - 2021-04-TBD
+
+### Changed
+- **BREAKING**: Update KEY_TYPE to `X25519KeyAgreementKey2020`.
+
 ## 2.0.0 - 2021-03-12
 
 ### Changed
-- **BREAKING**: Changed README instructions to use 
+- **BREAKING**: Changed README instructions to use
   [`x25519-key-agreement-key-2019 v4+`](https://github.com/digitalbazaar/x25519-key-agreement-key-2019)
   key type examples, which itself is based on `crypto-ld v4+`.
   See also [`x25519-key-agreement-key-2019 v4+` Changelog](https://github.com/digitalbazaar/x25519-key-agreement-key-2019/blob/master/CHANGELOG.md#400---2021-03-11),
   [`crypto-ld` v4.0 Changelog](https://github.com/digitalbazaar/crypto-ld/blob/master/CHANGELOG.md#400---2020-08-01)
 - Update `@stablelib/chacha20poly1305` and `@stablelib/xchacha20poly1305` deps
   to their latest 1.0 versions. (Should be no breaking changes there.)
-- Update `web-streams-polyfill` to major version `v3.0.0` 
+- Update `web-streams-polyfill` to major version `v3.0.0`
   (see [its changelog entry](https://github.com/MattiasBuelens/web-streams-polyfill/blob/master/CHANGELOG.md#v300-2020-07-20)).
   (Should be no changes that affect this lib.)
 
