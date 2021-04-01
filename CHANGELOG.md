@@ -1,6 +1,6 @@
 # minimal-cipher ChangeLog
 
-## 3.0.0 - 2021-04-TBD
+## 3.0.0 - 2021-04-01
 
 ### Changed
 - **BREAKING**: Update KEY_TYPE to `X25519KeyAgreementKey2020`.
