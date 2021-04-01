@@ -94,7 +94,6 @@ describe('minimal-cipher', function() {
               chunks.push(value);
             }
           } catch(e) {
-            console.error(e);
             throw e;
           }
         }
@@ -138,7 +137,6 @@ describe('minimal-cipher', function() {
               data = next;
             }
           } catch(e) {
-            console.error(e);
             throw e;
           }
         }

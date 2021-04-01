@@ -11,17 +11,16 @@ const {store} = require('./store');
 module.exports = class KaK {
   constructor({keyPair, id = 'urn:123'} = {}) {
     this.id = id,
-    this.type = 'X25519KeyAgreementKey2019';
+    this.type = 'X25519KeyAgreementKey2020';
     if(!keyPair) {
       keyPair = nacl.box.keyPair();
       this.privateKey = keyPair.secretKey;
       this.publicKey = keyPair.publicKey;
-      this.publicKeyBase58 = base58.encode(this.publicKey);
     } else {
       this.privateKey = base58.decode(keyPair.privateKeyBase58);
       this.publicKey = base58.decode(keyPair.publicKeyBase58);
-      this.publicKeyBase58 = keyPair.publicKeyBase58;
     }
+    this.publicKeyMultibase = `z${base58.encode(this.publicKey)}`;
     store.set(id, this.publicKeyNode);
   }
   /**
@@ -32,10 +31,10 @@ module.exports = class KaK {
    */
   get publicKeyNode() {
     return {
-      '@context': 'https://w3id.org/security/v2',
+      '@context': 'https://w3id.org/security/suites/x25519-2020/v1',
       id: this.id,
       type: this.type,
-      publicKeyBase58: this.publicKeyBase58
+      publicKeyMultibase: this.publicKeyMultibase
     };
   }
   /**
@@ -50,7 +49,9 @@ module.exports = class KaK {
     };
   }
   async deriveSecret({publicKey}) {
-    const remotePublicKey = base58.decode(publicKey.publicKeyBase58);
+    const publicKeyBase58 = publicKey.publicKeyMultibase.slice(1);
+
+    const remotePublicKey = base58.decode(publicKeyBase58);
     const {privateKey} = this;
     return dhDeriveSecret({privateKey, remotePublicKey});
   }
