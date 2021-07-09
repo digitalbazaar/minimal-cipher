@@ -9,7 +9,12 @@ const {TextDecoder, ReadableStream} = require('../../util');
 const KaK = require('../KaK');
 const {isJWE, isRecipient} = require('../chai-cipher');
 const {store} = require('../store');
-const {LEGACY_JWE, LEGACY_KEY_PAIR} = require('../mock-data');
+const {
+  LEGACY_JWE, LEGACY_KEY_PAIR, key1Data, key2Data
+} = require('../mock-data');
+const {createKeyResolver} = require('./didKeyResolver');
+const {X25519KeyAgreementKey2020} =
+  require('@digitalbazaar/x25519-key-agreement-key-2020');
 
 const should = chai.should();
 chai.use(isJWE);
@@ -21,7 +26,7 @@ describe('minimal-cipher', function() {
     describe(`${algorithm} algorithm`, function() {
 
       // each test inits data to null
-      let cipher, testKaK, recipient = null;
+      let cipher; let testKaK; let recipient = null;
 
       // keyResolver returns publicKeyNode
       const keyResolver = async ({id}) => store.get(id);
@@ -453,6 +458,35 @@ describe('minimal-cipher', function() {
           {jwe, keyAgreementKey: testKaK});
         result.should.eql(obj);
       });
+      it('should encrypt and decrypt an object', async function() {
+        const obj = {simple: true};
+        console.dir(recipient);
+        const result = await cipher.encryptObject(
+          {obj, recipients: recipient, keyResolver});
+        result.should.be.a.JWE;
+        const decryptResult = await cipher.decryptObject({
+          jwe: result, keyAgreementKey: testKaK
+        });
+        decryptResult.should.eql(obj);
+      });
+      it('should encrypt and decrypt an object using didKeyResolver',
+        async function() {
+          const key1 = new X25519KeyAgreementKey2020({...key1Data});
+          const key2 = new X25519KeyAgreementKey2020({...key2Data});
+          const recipients = [
+            {header: {kid: key1.id, alg: 'ECDH-ES+A256KW'}},
+            {header: {kid: key2.id, alg: 'ECDH-ES+A256KW'}}
+          ];
+          const keyResolver2 = createKeyResolver();
+          const obj = {simple: true};
+          const result = await cipher.encryptObject(
+            {obj, recipients, keyResolver: keyResolver2});
+          result.should.be.a.JWE;
+          const decryptResult = await cipher.decryptObject({
+            jwe: result, keyAgreementKey: key1
+          });
+          decryptResult.should.eql(obj);
+        });
     });
   });
 });
