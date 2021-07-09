@@ -28,3 +28,20 @@ exports.LEGACY_KEY_PAIR = {
   publicKeyBase58: 'C5URuM3ttmRa2s7BtcBUv2688Z23prZBX5qyQWNnn9UJ'
 };
 
+exports.key1Data = {
+  id: 'did:key:z6MkuBLrjSGt1PPADAvuv6rmvj4FfSAfffJotC6K8ZEorYmv#z6LSe' +
+  'RSE5Em5oJpwdk3NBaLVERBS332ULC7EQq5EtMsmXhsM',
+  controller: 'did:key:z6MkuBLrjSGt1PPADAvuv6rmvj4FfSAfffJotC6K8ZEorYmv',
+  type: 'X25519KeyAgreementKey2020',
+  publicKeyMultibase: 'z6LSeRSE5Em5oJpwdk3NBaLVERBS332ULC7EQq5EtMsmXhsM',
+  privateKeyMultibase: 'z3weeMD56C1T347EmB6kYNS7trpQwjvtQCpCYRpqGz6mcemT'
+};
+
+exports.key2Data = {
+  id: 'did:key:z6MkttYcTAeZbVsBiAmxFj2LNSgNzj5gAdb3hbE4QwmFTK4Z#z6LSjPQz1GAR' +
+  'HBL7vnMW8XiH3UYVkgETpyk8oKhXeeFRGpQh',
+  controller: 'did:key:z6MkttYcTAeZbVsBiAmxFj2LNSgNzj5gAdb3hbE4QwmFTK4Z',
+  type: 'X25519KeyAgreementKey2020',
+  publicKeyMultibase: 'z6LSjPQz1GARHBL7vnMW8XiH3UYVkgETpyk8oKhXeeFRGpQh',
+  privateKeyMultibase: 'z3web9AUP49zFCBVEdQ4ksbSmzgi6JqNCA84XNxUAcMDZgZc'
+};
