@@ -460,7 +460,6 @@ describe('minimal-cipher', function() {
       });
       it('should encrypt and decrypt an object', async function() {
         const obj = {simple: true};
-        console.dir(recipient);
         const result = await cipher.encryptObject(
           {obj, recipients: recipient, keyResolver});
         result.should.be.a.JWE;
