@@ -29,12 +29,12 @@ exports.LEGACY_KEY_PAIR = {
 };
 
 exports.key1Data = {
-  id: 'did:key:z6MkuBLrjSGt1PPADAvuv6rmvj4FfSAfffJotC6K8ZEorYmv#z6LSe' +
-  'RSE5Em5oJpwdk3NBaLVERBS332ULC7EQq5EtMsmXhsM',
-  controller: 'did:key:z6MkuBLrjSGt1PPADAvuv6rmvj4FfSAfffJotC6K8ZEorYmv',
+  id: 'did:key:z6MkwLz9d2sa3FJjni9A7rXmicf9NN3e5xgJPUmdqaFMTgoE#' +
+    'z6LSmgLugoC8vUoK1ouCTGKdqFdpg5jb3H193L6wFJucX14U',
+  controller: 'did:key:z6MkwLz9d2sa3FJjni9A7rXmicf9NN3e5xgJPUmdqaFMTgoE',
   type: 'X25519KeyAgreementKey2020',
-  publicKeyMultibase: 'z6LSeRSE5Em5oJpwdk3NBaLVERBS332ULC7EQq5EtMsmXhsM',
-  privateKeyMultibase: 'z3weeMD56C1T347EmB6kYNS7trpQwjvtQCpCYRpqGz6mcemT'
+  publicKeyMultibase: 'z6LSmgLugoC8vUoK1ouCTGKdqFdpg5jb3H193L6wFJucX14U',
+  privateKeyMultibase: 'z3wedGgRfySXFenmev8caU3eqBeDXrzDsdi21ofMZN8s8Exm'
 };
 
 exports.key2Data = {
