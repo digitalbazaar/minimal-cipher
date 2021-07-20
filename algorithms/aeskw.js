@@ -51,8 +51,9 @@ class Kek {
       const extractable = true;
       console.log(kek, '<><><><><><>kek:unwrapKey()');
       console.log(wrappedKey, 'wrappedKey:unwrapKey()<><><><>');
+      const wrappedKeyUintArray = new Uint8Array(wrappedKey);
       const key = await crypto.subtle.unwrapKey(
-        'raw', wrappedKey, kek, kek.algorithm,
+        'raw', wrappedKeyUintArray, kek, kek.algorithm,
         {name: 'AES-KW'}, extractable, ['encrypt']);
       console.log(key, '<><><><><>key:unwrapKey()');
       const keyBytes = await crypto.subtle.exportKey('raw', key);
