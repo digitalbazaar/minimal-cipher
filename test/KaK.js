@@ -6,8 +6,9 @@
 const base58 = require('base58-universal');
 const nacl = require('tweetnacl');
 const {
-  // deriveSecret: dhDeriveSecret,
-  multibaseEncode, MULTICODEC_X25519_PUB_HEADER
+  deriveSecret: dhDeriveSecret,
+  multibaseEncode, MULTICODEC_X25519_PUB_HEADER,
+  multibaseDecode
 } = require('../algorithms/x25519');
 const {store} = require('./store');
 
@@ -54,12 +55,12 @@ module.exports = class KaK {
       header: {kid: this.id, alg: 'ECDH-ES+A256KW'}
     };
   }
-  // Unused.
-  // async deriveSecret({publicKey}) {
-  //   const publicKeyBase58 = publicKey.publicKeyMultibase.slice(1);
-  //
-  //   const remotePublicKey = base58.decode(publicKeyBase58);
-  //   const {privateKey} = this;
-  //   return dhDeriveSecret({privateKey, remotePublicKey});
-  // }
+  async deriveSecret({publicKey}) {
+    const remotePublicKey = multibaseDecode(
+      MULTICODEC_X25519_PUB_HEADER, publicKey.publicKeyMultibase);
+
+    const {privateKey} = this;
+
+    return dhDeriveSecret({privateKey, remotePublicKey});
+  }
 };
