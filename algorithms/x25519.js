@@ -12,7 +12,7 @@ const KEY_TYPE = 'X25519KeyAgreementKey2020';
 // multibase base58-btc header
 const MULTIBASE_BASE58BTC_HEADER = 'z';
 // multicodec X25519-pub header as varint
-const MULTICODEC_X25519_PUB_HEADER = new Uint8Array([0xec, 0x01]);
+export const MULTICODEC_X25519_PUB_HEADER = new Uint8Array([0xec, 0x01]);
 export const JWE_ALG = 'ECDH-ES+A256KW';
 export {deriveEphemeralKeyPair, deriveSecret};
 
@@ -55,8 +55,18 @@ export async function kekFromEphemeralPeer({keyAgreementKey, epk}) {
   };
 }
 
-// Encryption case: get Kek *and* ephemeral DH key from a peer's public
-// static key
+/**
+ * (Encryption case) Gets Kek *and* ephemeral DH key from a peer's public
+ * static key.
+ *
+ * @param {object} options - Options hashmap.
+ * @param {object} options.ephemeralKeyPair - Ephemeral key pair.
+ * @param {object} options.staticPublicKey - Static public key.
+ * @typedef {object} Kek
+ * @returns {Promise<{
+ *   kek: Kek, epk: *, apv: (*|string), apu: (*|string), ephemeralPublicKey
+ * }>} - Resolves with kek object derived from static peer.
+ */
 export async function kekFromStaticPeer({ephemeralKeyPair, staticPublicKey}) {
   if(!staticPublicKey) {
     throw new Error('"staticPublicKey" is required.');
@@ -67,8 +77,9 @@ export async function kekFromStaticPeer({ephemeralKeyPair, staticPublicKey}) {
     throw new Error(
       `"staticPublicKey.type" must be "${KEY_TYPE}".`);
   }
-  const publicKeyBase58 = staticPublicKey.publicKeyMultibase.slice(1);
-  const remotePublicKey = base58btc.decode(publicKeyBase58);
+  const remotePublicKey = multibaseDecode(
+    MULTICODEC_X25519_PUB_HEADER, staticPublicKey.publicKeyMultibase
+  );
 
   const encoder = new TextEncoder();
   // "Party U Info"
@@ -99,4 +110,21 @@ export function multibaseEncode(header, bytes) {
   mcBytes.set(header);
   mcBytes.set(bytes, header.length);
   return MULTIBASE_BASE58BTC_HEADER + base58btc.encode(mcBytes);
+}
+
+/**
+ * Decodes a given string as a multibase-encoded multicodec value.
+ *
+ * @param {Uint8Array} header - Expected header bytes for the multicodec value.
+ * @param {string} text - Multibase encoded string to decode.
+ * @returns {Uint8Array} Decoded bytes.
+ */
+export function multibaseDecode(header, text) {
+  const mcValue = base58btc.decode(text.substr(1));
+
+  if(!header.every((val, i) => mcValue[i] === val)) {
+    throw new Error('Multibase value does not have expected header.');
+  }
+
+  return mcValue.slice(header.length);
 }
