@@ -111,7 +111,11 @@ export class DecryptTransformer {
     const {keyAgreement} = this;
     const {kek} = await keyAgreement.kekFromEphemeralPeer(
       {keyAgreementKey, epk});
+    console.log(kek, '<><><><><>kek:decrypt()');
+    console.log(wrappedKey, '<><><><><>wrappedKey:decrypt()');
+    console.log(await kek.unwrapKey({wrappedKey}), '<><><><><><><>');
     const cek = await kek.unwrapKey({wrappedKey});
+    console.log(cek, '<><><><><><>cek');
     if(!cek) {
       // failed to unwrap key
       return null;
