@@ -35,7 +35,7 @@ export async function kekFromEphemeralPeer({keyAgreementKey, epk}) {
   const ephemeralPublicKey = {
     type: KEY_TYPE,
     publicKeyMultibase:
-      _multibaseEncode(MULTICODEC_X25519_PUB_HEADER, publicKey)
+      multibaseEncode(MULTICODEC_X25519_PUB_HEADER, publicKey)
   };
   console.log(
     ephemeralPublicKey.publicKeyMultibase, 'ephemeralPublicKey::::::::');
@@ -86,7 +86,15 @@ export async function kekFromStaticPeer({ephemeralKeyPair, staticPublicKey}) {
   };
 }
 
-function _multibaseEncode(header, bytes) {
+/**
+ * Adds a multicodec prefix to a given bytes array representing a public
+ * or private key, and multibase-encodes the result.
+ *
+ * @param {Uint8Array} header - Multicodec x25519 pub or pri key header, varint.
+ * @param {Uint8Array} bytes - Byte array representing a public or private key.
+ * @returns {string} Base58-btc encoded key (with multicodec prefix).
+ */
+export function multibaseEncode(header, bytes) {
   const mcBytes = new Uint8Array(header.length + bytes.length);
   mcBytes.set(header);
   mcBytes.set(bytes, header.length);
