@@ -26,7 +26,7 @@ class Kek {
 
     unwrappedKey = await crypto.subtle.importKey(
       'raw', unwrappedKey, {name: 'AES-GCM', length: 256},
-      extractable, ['encrypt']);
+      extractable, ['wrapKey']);
     const wrappedKey = await crypto.subtle.wrapKey(
       'raw', unwrappedKey, kek, kek.algorithm);
     console.log(wrappedKey, '<><><><>wrappedKey:wrapKey()');
@@ -54,7 +54,7 @@ class Kek {
       const wrappedKeyUintArray = new Uint8Array(wrappedKey);
       const key = await crypto.subtle.unwrapKey(
         'raw', wrappedKeyUintArray, kek, kek.algorithm,
-        {name: 'AES-KW'}, extractable, ['encrypt']);
+        {name: 'AES-KW'}, extractable, ['unwrapKey']);
       console.log(key, '<><><><><>key:unwrapKey()');
       const keyBytes = await crypto.subtle.exportKey('raw', key);
       return new Uint8Array(keyBytes);
