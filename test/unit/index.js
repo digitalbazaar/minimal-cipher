@@ -468,7 +468,7 @@ describe('minimal-cipher', function() {
         });
         decryptResult.should.eql(obj);
       });
-      it.only('should encrypt and decrypt an object using didKeyResolver',
+      it('should encrypt and decrypt an object using didKeyResolver',
         async function() {
           const key1 = new X25519KeyAgreementKey2020({...key1Data});
           const key2 = new X25519KeyAgreementKey2020({...key2Data});
@@ -484,7 +484,6 @@ describe('minimal-cipher', function() {
           const decryptResult = await cipher.decryptObject({
             jwe: result, keyAgreementKey: key1
           });
-          console.log(decryptResult, '<><><><><>');
           decryptResult.should.eql(obj);
         });
     });

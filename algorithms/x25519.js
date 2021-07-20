@@ -37,8 +37,7 @@ export async function kekFromEphemeralPeer({keyAgreementKey, epk}) {
     publicKeyMultibase:
       multibaseEncode(MULTICODEC_X25519_PUB_HEADER, publicKey)
   };
-  console.log(
-    ephemeralPublicKey.publicKeyMultibase, 'ephemeralPublicKey::::::::');
+
   // safe to use IDs like in rfc7518 or does
   // https://tools.ietf.org/html/rfc7748#section-7 pose any issues?
   const encoder = new TextEncoder();
@@ -48,7 +47,6 @@ export async function kekFromEphemeralPeer({keyAgreementKey, epk}) {
   const consumerInfo = encoder.encode(keyAgreementKey.id);
   const secret = await keyAgreementKey.deriveSecret(
     {publicKey: ephemeralPublicKey});
-  console.log(secret, 'secret:::::::::');
   const keyData = await deriveKey({secret, producerInfo, consumerInfo});
   return {
     kek: await createKek({keyData})
