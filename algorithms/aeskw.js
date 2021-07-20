@@ -29,6 +29,7 @@ class Kek {
       extractable, ['encrypt']);
     const wrappedKey = await crypto.subtle.wrapKey(
       'raw', unwrappedKey, kek, kek.algorithm);
+    console.log(wrappedKey, '<><><><>wrappedKey:wrapKey()');
     return base64url.encode(new Uint8Array(wrappedKey));
   }
 
@@ -48,12 +49,16 @@ class Kek {
     wrappedKey = base64url.decode(wrappedKey);
     try {
       const extractable = true;
+      console.log(kek, '<><><><><><>kek:unwrapKey()');
+      console.log(wrappedKey, 'wrappedKey:unwrapKey()<><><><>');
       const key = await crypto.subtle.unwrapKey(
         'raw', wrappedKey, kek, kek.algorithm,
-        {name: 'AES-GCM'}, extractable, ['encrypt']);
+        {name: 'AES-KW'}, extractable, ['encrypt']);
+      console.log(key, '<><><><><>key:unwrapKey()');
       const keyBytes = await crypto.subtle.exportKey('raw', key);
       return new Uint8Array(keyBytes);
     } catch(e) {
+      console.log(e, 'e<><><><><><>');
       // decryption failed
       return null;
     }
