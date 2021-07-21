@@ -60,10 +60,11 @@ export async function kekFromEphemeralPeer({keyAgreementKey, epk}) {
  * @param {object} options - Options hashmap.
  * @param {object} options.ephemeralKeyPair - Ephemeral key pair.
  * @param {object} options.staticPublicKey - Static public key.
- * @typedef {object} Kek
- * @returns {Promise<{
- *   kek: Kek, epk: *, apv: (*|string), apu: (*|string), ephemeralPublicKey
- * }>} - Resolves with kek object derived from static peer.
+ * @typedef {{
+ *   kek: (object), epk: *, apv: (*|string), apu: (*|string), ephemeralPublicKey
+ * }} kekObject
+ * @returns {Promise<kekObject>} -
+ *   Resolves with kek object derived from static peer.
  */
 export async function kekFromStaticPeer({ephemeralKeyPair, staticPublicKey}) {
   if(!staticPublicKey) {
