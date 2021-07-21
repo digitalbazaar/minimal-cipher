@@ -7,8 +7,9 @@ const base58 = require('base58-universal');
 const nacl = require('tweetnacl');
 const {
   deriveSecret: dhDeriveSecret,
-  multibaseEncode, MULTICODEC_X25519_PUB_HEADER,
-  multibaseDecode
+  multibaseEncode,
+  multibaseDecode,
+  MULTICODEC_X25519_PUB_HEADER
 } = require('../algorithms/x25519');
 const {store} = require('./store');
 
@@ -60,7 +61,6 @@ module.exports = class KaK {
       MULTICODEC_X25519_PUB_HEADER, publicKey.publicKeyMultibase);
 
     const {privateKey} = this;
-
     return dhDeriveSecret({privateKey, remotePublicKey});
   }
 };

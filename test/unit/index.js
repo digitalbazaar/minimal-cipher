@@ -26,7 +26,9 @@ describe('minimal-cipher', function() {
     describe(`${algorithm} algorithm`, function() {
 
       // each test inits data to null
-      let cipher; let testKaK; let recipient = null;
+      let cipher = null;
+      let testKaK = null;
+      let recipient = null;
 
       // keyResolver returns publicKeyNode
       const keyResolver = async ({id}) => store.get(id);
@@ -481,10 +483,18 @@ describe('minimal-cipher', function() {
           const result = await cipher.encryptObject(
             {obj, recipients, keyResolver: keyResolver2});
           result.should.be.a.JWE;
-          const decryptResult = await cipher.decryptObject({
+
+          // decrypt using key1
+          const decryptResult1 = await cipher.decryptObject({
             jwe: result, keyAgreementKey: key1
           });
-          decryptResult.should.eql(obj);
+          decryptResult1.should.eql(obj);
+
+          // decrypt using key2
+          const decryptResult2 = await cipher.decryptObject({
+            jwe: result, keyAgreementKey: key2
+          });
+          decryptResult2.should.eql(obj);
         });
     });
   });
