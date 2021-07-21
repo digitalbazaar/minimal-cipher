@@ -45,7 +45,7 @@ class Kek {
   async unwrapKey({wrappedKey}) {
     const kek = this.key;
     // Note: `AES-GCM` algorithm name doesn't matter; will be exported raw.
-    wrappedKey = new Uint8Array(base64url.decode(wrappedKey));
+    wrappedKey = base64url.decode(wrappedKey);
     try {
       const extractable = true;
       const key = await crypto.subtle.unwrapKey(
