@@ -54,8 +54,8 @@ export async function kekFromEphemeralPeer({keyAgreementKey, epk}) {
 }
 
 /**
- * (Encryption case) Gets Kek *and* ephemeral DH key from a peer's public
- * static key.
+ * (Encryption case) Generates KEK from ephemeral DH private key and a peer's
+ * public static key.
  *
  * @param {object} options - Options hashmap.
  * @param {object} options.ephemeralKeyPair - Ephemeral key pair.
@@ -63,8 +63,8 @@ export async function kekFromEphemeralPeer({keyAgreementKey, epk}) {
  * @typedef {{
  *   kek: (object), epk: *, apv: (*|string), apu: (*|string), ephemeralPublicKey
  * }} kekObject
- * @returns {Promise<kekObject>} -
- *   Resolves with kek object derived from static peer.
+ * @returns {Promise<kekObject>} - Resolves with kek object derived from static
+ *   peer.
  */
 export async function kekFromStaticPeer({ephemeralKeyPair, staticPublicKey}) {
   if(!staticPublicKey) {
@@ -77,8 +77,7 @@ export async function kekFromStaticPeer({ephemeralKeyPair, staticPublicKey}) {
       `"staticPublicKey.type" must be "${KEY_TYPE}".`);
   }
   const remotePublicKey = multibaseDecode(
-    MULTICODEC_X25519_PUB_HEADER, staticPublicKey.publicKeyMultibase
-  );
+    MULTICODEC_X25519_PUB_HEADER, staticPublicKey.publicKeyMultibase);
 
   const encoder = new TextEncoder();
   // "Party U Info"
