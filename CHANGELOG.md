@@ -1,10 +1,10 @@
 # minimal-cipher ChangeLog
 
-## 3.1.0 - 2021-TBD
+## 4.0.0 - 2021-07-22
 
 ### Changed
-- Add multicode public headers when encoding `publicKey` and decoding
-  `publicKeyMultibase`.
+- **BREAKING**: Upgrade to `@digitalbazaar/x25519-verification-key-2020` v2.0,
+  which changes the key serialization format to multicodec (in addition to multibase).
 
 ## 3.0.0 - 2021-04-01
 
