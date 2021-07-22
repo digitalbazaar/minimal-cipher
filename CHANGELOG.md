@@ -1,5 +1,11 @@
 # minimal-cipher ChangeLog
 
+## 3.1.0 - 2021-TBD
+
+### Changed
+- Add multicode public headers when encoding `publicKey` and decoding
+  `publicKeyMultibase`.
+
 ## 3.0.0 - 2021-04-01
 
 ### Changed
