@@ -1,5 +1,16 @@
 # minimal-cipher ChangeLog
 
+## 4.0.1 - 2021-08-xx
+
+### Fixed
+- Pin web-streams-polyfill@3.0.x. This has been done because version 3.1+ of the
+  polyfill have added checks to force the same version of the polyfill to be used
+  across all code that uses the ReadableStream API. This means that the polyfill
+  does not just polyfill an interface such that it is compatible with other
+  libraries; those libraries must all know about each other and use the exact
+  same implementation. Hopefully, this will be fixed in a later version of the
+  polyfill.
+
 ## 4.0.0 - 2021-07-22
 
 ### Changed

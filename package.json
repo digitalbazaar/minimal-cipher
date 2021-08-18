@@ -33,7 +33,7 @@
     "esm": "^3.2.25",
     "isomorphic-webcrypto": "^2.3.2",
     "tweetnacl": "^1.0.1",
-    "web-streams-polyfill": "^3.0.2"
+    "web-streams-polyfill": "~3.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.13.10",
