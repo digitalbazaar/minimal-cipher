@@ -1,6 +1,6 @@
 # minimal-cipher ChangeLog
 
-## 4.0.1 - 2021-08-xx
+## 4.0.1 - 2021-08-18
 
 ### Fixed
 - Pin web-streams-polyfill@3.0.x. This has been done because version 3.1+ of the
