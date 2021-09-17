@@ -1,6 +1,6 @@
 # minimal-cipher ChangeLog
 
-## 4.0.2 - 2021-09-xx
+## 4.0.2 - 2021-09-17
 
 ### Fixed
 - Fix parameters passed to key wrap/unwrapping functions in aeskw.js. The key
