@@ -1,5 +1,14 @@
 # minimal-cipher ChangeLog
 
+## 4.0.2 - 2021-09-xx
+
+### Fixed
+- Fix parameters passed to key wrap/unwrapping functions in aeskw.js. The key
+  usage param for the key to be wrapped/unwrapped was inconsistent and not
+  accepted on certain browsers (Firefox). A previous commit conflated the key
+  usage field for the key to be wrapped with the key wrapping key itself and
+  this has been corrected and commented to help avoid future problems.
+
 ## 4.0.1 - 2021-08-18
 
 ### Fixed
