@@ -1,19 +1,17 @@
 /*!
  * Copyright (c) 2019-2020 Digital Bazaar, Inc. All rights reserved.
  */
-'use strict';
-
-const base58 = require('base58-universal');
-const nacl = require('tweetnacl');
-const {
-  deriveSecret: dhDeriveSecret,
+import * as base58 from 'base58-universal';
+import nacl from 'tweetnacl';
+import {
+  deriveSecret as dhDeriveSecret,
   multibaseEncode,
   multibaseDecode,
   MULTICODEC_X25519_PUB_HEADER
-} = require('../algorithms/x25519');
-const {store} = require('./store');
+} from '../lib/algorithms/x25519.js';
+import {store} from './store.js';
 
-module.exports = class KaK {
+export class KaK {
   constructor({keyPair, id = 'urn:123'} = {}) {
     this.id = id;
     this.type = 'X25519KeyAgreementKey2020';
@@ -63,4 +61,4 @@ module.exports = class KaK {
     const {privateKey} = this;
     return dhDeriveSecret({privateKey, remotePublicKey});
   }
-};
+}

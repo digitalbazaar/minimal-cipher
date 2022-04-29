@@ -1,20 +1,18 @@
 /*!
- * Copyright (c) 2019-2021 Digital Bazaar, Inc. All rights reserved.
+ * Copyright (c) 2019-2022 Digital Bazaar, Inc. All rights reserved.
  */
-'use strict';
-
-const chai = require('chai');
-const {Cipher} = require('../../');
-const {TextDecoder, ReadableStream} = require('../../util');
-const KaK = require('../KaK');
-const {isJWE, isRecipient} = require('../chai-cipher');
-const {store} = require('../store');
-const {
+import chai from 'chai';
+import {Cipher} from '../../lib/index.js';
+import {ReadableStream} from '../../lib/util.js';
+import {KaK} from '../KaK.js';
+import {isJWE, isRecipient} from '../chai-cipher.js';
+import {store} from '../store.js';
+import {
   LEGACY_JWE, LEGACY_KEY_PAIR, key1Data, key2Data
-} = require('../mock-data');
-const {createKeyResolver} = require('./didKeyResolver');
-const {X25519KeyAgreementKey2020} =
-  require('@digitalbazaar/x25519-key-agreement-key-2020');
+} from '../mock-data.js';
+import {createKeyResolver} from './didKeyResolver.js';
+import {X25519KeyAgreementKey2020} from
+  '@digitalbazaar/x25519-key-agreement-key-2020';
 
 const should = chai.should();
 chai.use(isJWE);

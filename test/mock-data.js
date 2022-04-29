@@ -1,6 +1,6 @@
 // `C20P` encrypted legacy JWE; backwards compatible support for decrypting
 // this is in this library (but cannot encrypt using it)
-exports.LEGACY_JWE = {
+export const LEGACY_JWE = {
   protected: 'eyJlbmMiOiJBMjU2R0NNIn0',
   recipients: [
     {
@@ -23,12 +23,12 @@ exports.LEGACY_JWE = {
   tag: 'eIzP_YhcLSuX-qJANN7M7A'
 };
 
-exports.LEGACY_KEY_PAIR = {
+export const LEGACY_KEY_PAIR = {
   privateKeyBase58: 'DqBNP7KkbiTJbXAA6AmfTjhQU3cMeQwtDBeM8Z92duz1',
   publicKeyBase58: 'C5URuM3ttmRa2s7BtcBUv2688Z23prZBX5qyQWNnn9UJ'
 };
 
-exports.key1Data = {
+export const key1Data = {
   id: 'did:key:z6MkwLz9d2sa3FJjni9A7rXmicf9NN3e5xgJPUmdqaFMTgoE#' +
     'z6LSmgLugoC8vUoK1ouCTGKdqFdpg5jb3H193L6wFJucX14U',
   controller: 'did:key:z6MkwLz9d2sa3FJjni9A7rXmicf9NN3e5xgJPUmdqaFMTgoE',
@@ -37,7 +37,7 @@ exports.key1Data = {
   privateKeyMultibase: 'z3wedGgRfySXFenmev8caU3eqBeDXrzDsdi21ofMZN8s8Exm'
 };
 
-exports.key2Data = {
+export const key2Data = {
   id: 'did:key:z6MkttYcTAeZbVsBiAmxFj2LNSgNzj5gAdb3hbE4QwmFTK4Z#z6LSjPQz1GAR' +
   'HBL7vnMW8XiH3UYVkgETpyk8oKhXeeFRGpQh',
   controller: 'did:key:z6MkttYcTAeZbVsBiAmxFj2LNSgNzj5gAdb3hbE4QwmFTK4Z',
