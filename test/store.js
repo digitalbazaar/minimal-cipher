@@ -1,1 +1,1 @@
-exports.store = new Map();
+export const store = new Map();

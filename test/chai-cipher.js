@@ -1,12 +1,11 @@
 /*!
- * Copyright (c) 2019-2020 Digital Bazaar, Inc. All rights reserved.
+ * Copyright (c) 2019-2022 Digital Bazaar, Inc. All rights reserved.
  */
-'use strict';
-const chai = require('chai');
+import chai from 'chai';
 const should = chai.should();
 
 // extends chai with a new assertion is JWE
-exports.isJWE = function(chai) {
+export function isJWE(chai) {
   const {Assertion} = chai;
   Assertion.addProperty('JWE', function() {
     const jwe = this._obj;
@@ -27,13 +26,12 @@ exports.isJWE = function(chai) {
     new Assertion(jwe.tag).to.be.a(
       'string', 'Expected JWE tag to be a string');
   });
-};
+}
 
 // helper to assert on recipients
-exports.isRecipient = ({recipients, kak}) => {
+export function isRecipient({recipients, kak}) {
   const recipient = recipients.find(
     r => r.header.kid == kak.id);
   should.exist(recipient);
   recipient.should.be.an('object');
-};
-
+}
