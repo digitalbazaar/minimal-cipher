@@ -11,7 +11,7 @@
     "./lib/util.js": "./lib/util-browser.js"
   },
   "files": [
-    "lib"
+    "lib/**/*.js"
   ],
   "scripts": {
     "test": "npm run test-node",
