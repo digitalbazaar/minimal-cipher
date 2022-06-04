@@ -5,6 +5,7 @@
 ### Changed
 - **BREAKING**: Convert to module (ESM).
 - **BREAKING**: Require Node.js >=14.
+- **BREAKING**: Use `globalThis` for browser crypto and streams.
 - Update dependencies.
 - Lint module.
 
