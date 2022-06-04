@@ -14,7 +14,7 @@
     "lib"
   ],
   "scripts": {
-    "test": "npm run lint && cd test && npm run test-node && npm run test-karma",
+    "test": "npm run test-node",
     "test-node": "cross-env NODE_ENV=test mocha -t 30000 -R ${REPORTER:-spec} test/unit/index.js",
     "test-karma": "cd test && karma start karma.conf.cjs",
     "coverage": "cross-env NODE_ENV=test c8 npm run test-node",
