@@ -44,6 +44,7 @@ APIs, including Web KMS (TODO: citation needed).
 
 - Node.js 14+ required.
 - WebCrypto required. Older browsers and Node.js 14 must use a polyfill.
+- WebStreams required. Older browsers and Node.js <18 must use a polyfill.
 
 To install locally (for development):
 
