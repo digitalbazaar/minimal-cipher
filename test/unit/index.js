@@ -3,7 +3,6 @@
  */
 import chai from 'chai';
 import {Cipher} from '../../lib/index.js';
-import {ReadableStream} from '../../lib/util.js';
 import {KaK} from '../KaK.js';
 import {isJWE, isRecipient} from '../chai-cipher.js';
 import {store} from '../store.js';

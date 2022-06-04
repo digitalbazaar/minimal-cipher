@@ -8,6 +8,8 @@
 - **BREAKING**: Use `globalThis` for browser crypto and streams.
 - **BREAKING**: Require WebCrypto. Older browsers and Node.js 14 users need to
   install an appropriate polyfill.
+- **BREAKING**: Require WebStreams. Older browsers and Node.js <18 users need to
+  install an appropriate polyfill.
 - Update dependencies.
 - Lint module.
 
@@ -40,7 +42,7 @@
 ## 3.0.0 - 2021-04-01
 
 ### Changed
-- **BREAKING**: Update KEY_TYPE to `X25519KeyAgreementKey2020`.
+- **BREAKING**: Update `KEY_TYPE` to `X25519KeyAgreementKey2020`.
 
 ## 2.0.0 - 2021-03-12
 
