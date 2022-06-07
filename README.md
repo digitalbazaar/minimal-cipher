@@ -43,8 +43,8 @@ APIs, including Web KMS (TODO: citation needed).
 ## Install
 
 - Node.js 14+ required.
-- WebCrypto required. Older browsers and Node.js 14 must use a polyfill.
-- WebStreams required. Older browsers and Node.js <18 must use a polyfill.
+- [Streams API][] required. Older browsers and Node.js <18 must use a polyfill.
+- [Web Crypto API][] required. Older browsers and Node.js 14 must use a polyfill.
 
 To install locally (for development):
 
@@ -188,3 +188,6 @@ Digital Bazaar: support@digitalbazaar.com
 ## License
 
 [New BSD License (3-clause)](LICENSE) © Digital Bazaar
+
+[Streams API]: https://developer.mozilla.org/en-US/docs/Web/API/Streams_API
+[Web Crypto API]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API
