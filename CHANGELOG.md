@@ -1,6 +1,6 @@
 # minimal-cipher ChangeLog
 
-## 5.0.0 - 2022-xx-xx
+## 5.0.0 - 2022-06-06
 
 ### Changed
 - **BREAKING**: Convert to module (ESM).
