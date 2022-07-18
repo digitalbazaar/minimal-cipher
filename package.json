@@ -6,6 +6,7 @@
   "type": "module",
   "exports": "./lib/index.js",
   "browser": {
+    "./lib/algorithms/c20p.js": "./lib/algorithms/c20p-browser.js",
     "./lib/algorithms/x25519-helper.js": "./lib/algorithms/x25519-helper-browser.js",
     "./lib/crypto.js": "./lib/crypto-browser.js"
   },
@@ -22,6 +23,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@stablelib/chacha": "^1.0.1",
     "@stablelib/chacha20poly1305": "^1.0.1",
     "@stablelib/xchacha20poly1305": "^1.0.1",
     "base58-universal": "^2.0.0",
