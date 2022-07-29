@@ -25,7 +25,6 @@
   "dependencies": {
     "@stablelib/chacha": "^1.0.1",
     "@stablelib/chacha20poly1305": "^1.0.1",
-    "@stablelib/xchacha20poly1305": "^1.0.1",
     "base58-universal": "^2.0.0",
     "base64url-universal": "^2.0.0",
     "tweetnacl": "^1.0.3"
