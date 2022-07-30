@@ -1,5 +1,11 @@
 # minimal-cipher ChangeLog
 
+## 5.1.0 - 2022-07-xx
+
+### Added
+- Use platform-specific native APIs where possible to implement
+  ChaCha20-Poly1305 and XChaCha20-Poly1305.
+
 ## 5.0.0 - 2022-06-06
 
 ### Changed
