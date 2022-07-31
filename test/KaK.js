@@ -1,5 +1,5 @@
 /*!
- * Copyright (c) 2019-2020 Digital Bazaar, Inc. All rights reserved.
+ * Copyright (c) 2019-2022 Digital Bazaar, Inc. All rights reserved.
  */
 import * as base58 from 'base58-universal';
 import nacl from 'tweetnacl';
@@ -16,6 +16,7 @@ export class KaK {
     this.id = id;
     this.type = 'X25519KeyAgreementKey2020';
     if(!keyPair) {
+      // use `tweetnacl` lib to cross-compare X25519 implementations
       keyPair = nacl.box.keyPair();
       this.privateKey = keyPair.secretKey;
       this.publicKey = keyPair.publicKey;

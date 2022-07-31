@@ -23,11 +23,11 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@noble/ed25519": "^1.6.1",
     "@stablelib/chacha": "^1.0.1",
     "@stablelib/chacha20poly1305": "^1.0.1",
     "base58-universal": "^2.0.0",
-    "base64url-universal": "^2.0.0",
-    "tweetnacl": "^1.0.3"
+    "base64url-universal": "^2.0.0"
   },
   "devDependencies": {
     "@digitalbazaar/did-io": "^2.0.0",
@@ -50,6 +50,7 @@
     "karma-webpack": "^5.0.0",
     "mocha": "^10.0.0",
     "mocha-lcov-reporter": "^1.3.0",
+    "tweetnacl": "^1.0.3",
     "web-streams-polyfill": "^3.2.1",
     "webpack": "^5.73.0"
   },
