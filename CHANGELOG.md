@@ -1,6 +1,6 @@
 # minimal-cipher ChangeLog
 
-## 5.1.0 - 2022-07-xx
+## 5.1.0 - 2022-07-31
 
 ### Added
 - Use platform-specific native APIs where possible to implement
