@@ -1,6 +1,7 @@
 # Minimal Cipher _(@digitalbazaar/minimal-cipher)_
 
-> Minimal encryption/decryption [JWE](https://tools.ietf.org/html/rfc7516)/[CWE](https://tools.ietf.org/html/rfc8152) library, secure algs only, browser-compatible
+Minimal encryption/decryption [JWE](https://tools.ietf.org/html/rfc7516)
+library, secure algs only, browser-compatible.
 
 ## Table of Contents
 
