@@ -8,6 +8,11 @@
   it has been through a comprehensive security audit. Additional
   benefits include speed and tree-shaking capabilities.
 
+## 5.1.1 - 2022-08-14
+
+### Fixed
+- Fix chacha bug.
+
 ## 5.1.0 - 2022-07-31
 
 ### Added
