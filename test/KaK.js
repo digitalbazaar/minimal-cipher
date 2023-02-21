@@ -7,7 +7,8 @@ import {
   deriveSecret as dhDeriveSecret,
   multibaseEncode,
   multibaseDecode,
-  MULTICODEC_X25519_PUB_HEADER
+  MULTICODEC_X25519_PUB_HEADER,
+  MULTICODEC_X25519_PRIV_HEADER
 } from '../lib/algorithms/x25519.js';
 import {store} from './store.js';
 
@@ -26,6 +27,9 @@ export class KaK {
     }
     this.publicKeyMultibase = multibaseEncode(
       MULTICODEC_X25519_PUB_HEADER, this.publicKey
+    );
+    this.privateKeyMultibase = multibaseEncode(
+      MULTICODEC_X25519_PRIV_HEADER, this.privateKey
     );
 
     store.set(id, this.publicKeyNode);
@@ -53,6 +57,17 @@ export class KaK {
   get recipient() {
     return {
       header: {kid: this.id, alg: 'ECDH-ES+A256KW'}
+    };
+  }
+  /**
+   * Formats this Kak into a partially complete JOSE Header
+   * that can be used as a recipient of a JWE with sender auth.
+   *
+   * @returns {object} A partial JOSE header.
+   */
+  get recipientSenderAuth() {
+    return {
+      header: {kid: this.id, alg: 'ECDH-1PU+A256KW'}
     };
   }
   async deriveSecret({publicKey}) {
