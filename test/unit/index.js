@@ -493,6 +493,48 @@ describe('minimal-cipher', function() {
           });
           decryptResult2.should.eql(obj);
         });
+
+      it('should decrypt a simple object with sender key auth',
+        async function() {
+          const recipients = [testKaK.recipientSenderAuth];
+          const obj = {simple: true};
+          const jwe = await cipher.encryptObject(
+            {obj, recipients, keyResolver, keyAgreementKey: testKaK});
+          jwe.should.be.a.JWE;
+          jwe.recipients.length.should.equal(1);
+          isRecipient({recipients: jwe.recipients, kak: testKaK});
+          const result = await cipher.decryptObject(
+            {keyResolver, jwe, keyAgreementKey: testKaK});
+          result.should.eql(obj);
+        });
+
+      it('should encrypt and decrypt an object using didKeyResolver ECDH-1PU',
+        async function() {
+          const key1 = new X25519KeyAgreementKey2020({...key1Data});
+          const key2 = new X25519KeyAgreementKey2020({...key2Data});
+          const recipients = [
+            {header: {kid: key1.id, alg: 'ECDH-1PU+A256KW'}},
+            {header: {kid: key2.id, alg: 'ECDH-1PU+A256KW'}}
+          ];
+          const keyResolver2 = createKeyResolver();
+          const obj = {simple: true};
+          const result = await cipher.encryptObject({
+            obj, recipients, keyResolver: keyResolver2, keyAgreementKey: key1
+          });
+          result.should.be.a.JWE;
+
+          // decrypt using key1
+          const decryptResult1 = await cipher.decryptObject({
+            jwe: result, keyAgreementKey: key1, keyResolver: keyResolver2
+          });
+          decryptResult1.should.eql(obj);
+
+          // decrypt using key2
+          const decryptResult2 = await cipher.decryptObject({
+            jwe: result, keyAgreementKey: key2, keyResolver: keyResolver2
+          });
+          decryptResult2.should.eql(obj);
+        });
     });
   });
 });
