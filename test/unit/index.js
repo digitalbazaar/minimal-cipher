@@ -1,15 +1,15 @@
 /*!
- * Copyright (c) 2019-2022 Digital Bazaar, Inc. All rights reserved.
+ * Copyright (c) 2019-2023 Digital Bazaar, Inc. All rights reserved.
  */
+import {isJWE, isRecipient} from '../chai-cipher.js';
+import {
+  key1Data, key2Data, LEGACY_JWE, LEGACY_KEY_PAIR
+} from '../mock-data.js';
 import chai from 'chai';
 import {Cipher} from '../../lib/index.js';
-import {KaK} from '../KaK.js';
-import {isJWE, isRecipient} from '../chai-cipher.js';
-import {store} from '../store.js';
-import {
-  LEGACY_JWE, LEGACY_KEY_PAIR, key1Data, key2Data
-} from '../mock-data.js';
 import {createKeyResolver} from './didKeyResolver.js';
+import {KaK} from '../KaK.js';
+import {store} from '../store.js';
 import {X25519KeyAgreementKey2020} from
   '@digitalbazaar/x25519-key-agreement-key-2020';
 
