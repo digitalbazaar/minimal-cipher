@@ -1,14 +1,14 @@
 /*!
- * Copyright (c) 2019-2022 Digital Bazaar, Inc. All rights reserved.
+ * Copyright (c) 2019-2023 Digital Bazaar, Inc. All rights reserved.
  */
 import * as base58 from 'base58-universal';
-import nacl from 'tweetnacl';
 import {
   deriveSecret as dhDeriveSecret,
-  multibaseEncode,
   multibaseDecode,
+  multibaseEncode,
   MULTICODEC_X25519_PUB_HEADER
 } from '../lib/algorithms/x25519.js';
+import nacl from 'tweetnacl';
 import {store} from './store.js';
 
 export class KaK {
