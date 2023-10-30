@@ -42,7 +42,6 @@
     "eslint-config-digitalbazaar": "^5.0.1",
     "eslint-plugin-jsdoc": "^46.8.2",
     "eslint-plugin-unicorn": "^49.0.0",
-    "isomorphic-webcrypto": "^2.3.8",
     "karma": "^6.4.2",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^3.2.0",
@@ -87,6 +86,6 @@
     ]
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   }
 }

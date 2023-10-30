@@ -1,8 +1,9 @@
 # minimal-cipher ChangeLog
 
-## 5.2.0 - 2022-xx-xx
+## 6.0.0 - 2023-10-dd
 
 ### Changed
+- **BREAKING**: Require node >= 18.
 - Use `@noble/ed25519` to provide X25519 implementation. This lib
   is often used in other libs that are combined with this one and
   it has been through a comprehensive security audit. Additional
