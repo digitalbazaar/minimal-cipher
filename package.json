@@ -31,8 +31,9 @@
   },
   "devDependencies": {
     "@digitalbazaar/did-io": "^2.0.0",
-    "@digitalbazaar/did-method-key": "^3.0.0",
-    "@digitalbazaar/x25519-key-agreement-key-2020": "^3.0.0",
+    "@digitalbazaar/did-method-key": "^5.1.0",
+    "@digitalbazaar/ed25519-verification-key-2020": "^4.1.0",
+    "@digitalbazaar/x25519-key-agreement-key-2020": "^3.0.1",
     "@es-joy/jsdoccomment": "^0.40.1",
     "c8": "^7.11.3",
     "chai": "^4.3.6",
