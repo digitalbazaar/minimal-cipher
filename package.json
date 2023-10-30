@@ -23,7 +23,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@noble/ed25519": "^1.6.1",
+    "@noble/curves": "^1.2.0",
     "@stablelib/chacha": "^1.0.1",
     "@stablelib/chacha20poly1305": "^1.0.1",
     "base58-universal": "^2.0.0",

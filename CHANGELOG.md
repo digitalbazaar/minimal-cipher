@@ -4,7 +4,7 @@
 
 ### Changed
 - **BREAKING**: Require node >= 18.
-- Use `@noble/ed25519` to provide X25519 implementation. This lib
+- Use `@noble/curves` to provide X25519 implementation. This lib
   is often used in other libs that are combined with this one and
   it has been through a comprehensive security audit. Additional
   benefits include speed and tree-shaking capabilities.
