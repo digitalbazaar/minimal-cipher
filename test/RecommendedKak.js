@@ -11,7 +11,7 @@ import {
 import nacl from 'tweetnacl';
 import {store} from './store.js';
 
-export class KaK {
+export class RecommendedKak {
   constructor({keyPair, id = 'urn:123'} = {}) {
     this.id = id;
     this.type = 'X25519KeyAgreementKey2020';

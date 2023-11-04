@@ -8,7 +8,8 @@ import {
 import chai from 'chai';
 import {Cipher} from '../../lib/index.js';
 import {createKeyResolver} from './didKeyResolver.js';
-import {KaK} from '../KaK.js';
+//import {FipsKak} from '../FipsKak.js';
+import {RecommendedKak} from '../RecommendedKak.js';
 import {store} from '../store.js';
 import {X25519KeyAgreementKey2020} from
   '@digitalbazaar/x25519-key-agreement-key-2020';
@@ -17,14 +18,20 @@ const should = chai.should();
 chai.use(isJWE);
 
 const cipherAlgorithms = ['recommended', 'fips'];
+const KakClass = new Map([
+  ['recommended', RecommendedKak],
+  ['fips', RecommendedKak]//FipsKak],
+]);
 
 describe('minimal-cipher', function() {
   cipherAlgorithms.forEach(algorithm => {
+    const Kak = KakClass.get(algorithm);
+
     describe(`${algorithm} algorithm`, function() {
 
       // each test inits data to null
       let cipher = null;
-      let testKaK = null;
+      let testKak = null;
       let recipient = null;
 
       // keyResolver returns publicKeyNode
@@ -32,8 +39,8 @@ describe('minimal-cipher', function() {
 
       beforeEach(async function() {
         cipher = new Cipher({version: algorithm});
-        testKaK = new KaK({id: 'urn:123'});
-        recipient = [testKaK.recipient];
+        testKak = new Kak({id: 'urn:123'});
+        recipient = [testKak.recipient];
       });
 
       function getRandomUint8({size = 50} = {}) {
@@ -109,11 +116,11 @@ describe('minimal-cipher', function() {
        *
        * @param {object} options - Options to use.
        * @param {Array} options.chunks - An array of encrypted data.
-       * @param {KaK} options.keyAgreementKey - A KaK in the recipients.
+       * @param {Kak} options.keyAgreementKey - A Kak in the recipients.
        *
        * @returns {Promise<Uint8Array>} The unencrypted data.
        */
-      async function decryptStream({chunks, keyAgreementKey = testKaK}) {
+      async function decryptStream({chunks, keyAgreementKey = testKak}) {
         const stream = new ReadableStream({
           pull(controller) {
             chunks.forEach(c => controller.enqueue(c));
@@ -156,14 +163,14 @@ describe('minimal-cipher', function() {
         });
         result.should.be.a.JWE;
         result.recipients.length.should.equal(1);
-        isRecipient({recipients: result.recipients, kak: testKaK});
+        isRecipient({recipients: result.recipients, kak: testKak});
       });
 
       it('should encrypt a simple Uint8Array with multiple recipients',
         async function() {
           const data = getRandomUint8();
-          const secondKaK = new KaK({id: 'urn:recipient2'});
-          const recipients = [...recipient, secondKaK.recipient];
+          const secondKak = new Kak({id: 'urn:recipient2'});
+          const recipients = [...recipient, secondKak.recipient];
           const result = await cipher.encrypt({
             data,
             recipients,
@@ -171,15 +178,15 @@ describe('minimal-cipher', function() {
           });
           result.should.be.a.JWE;
           result.recipients.length.should.equal(2);
-          isRecipient({recipients: result.recipients, kak: testKaK});
-          isRecipient({recipients: result.recipients, kak: secondKaK});
+          isRecipient({recipients: result.recipients, kak: testKak});
+          isRecipient({recipients: result.recipients, kak: secondKak});
         });
 
       it('should fail if a recipient kid can not be resolved',
         async function() {
           const data = getRandomUint8();
-          const secondKaK = new KaK({id: 'urn:recipient2'});
-          const secondRecipient = {...secondKaK.recipient};
+          const secondKak = new Kak({id: 'urn:recipient2'});
+          const secondRecipient = {...secondKak.recipient};
           secondRecipient.header.kid = 'urn:not-found';
           const recipients = [...recipient, secondRecipient];
           let error = null;
@@ -208,7 +215,7 @@ describe('minimal-cipher', function() {
         });
         result.should.be.a.JWE;
         result.recipients.length.should.equal(1);
-        isRecipient({recipients: result.recipients, kak: testKaK});
+        isRecipient({recipients: result.recipients, kak: testKak});
       });
 
       it('should encrypt a simple object', async function() {
@@ -217,20 +224,20 @@ describe('minimal-cipher', function() {
           {obj, recipients: recipient, keyResolver});
         result.should.be.a.JWE;
         result.recipients.length.should.equal(1);
-        isRecipient({recipients: result.recipients, kak: testKaK});
+        isRecipient({recipients: result.recipients, kak: testKak});
       });
 
       it('should encrypt a simple object with multiple recipients',
         async function() {
           const obj = {simple: true};
-          const secondKaK = new KaK({id: 'urn:recipient2'});
-          const recipients = [...recipient, secondKaK.recipient];
+          const secondKak = new Kak({id: 'urn:recipient2'});
+          const recipients = [...recipient, secondKak.recipient];
           const result = await cipher.encryptObject(
             {obj, recipients, keyResolver});
           result.should.be.a.JWE;
           result.recipients.length.should.equal(2);
-          isRecipient({recipients: result.recipients, kak: testKaK});
-          isRecipient({recipients: result.recipients, kak: secondKaK});
+          isRecipient({recipients: result.recipients, kak: testKak});
+          isRecipient({recipients: result.recipients, kak: secondKak});
         });
 
       it('should encrypt a stream', async function() {
@@ -240,22 +247,22 @@ describe('minimal-cipher', function() {
         for(const chunk of chunks) {
           chunk.jwe.should.be.a.JWE;
           chunk.jwe.recipients.length.should.equal(1);
-          isRecipient({recipients: chunk.jwe.recipients, kak: testKaK});
+          isRecipient({recipients: chunk.jwe.recipients, kak: testKak});
         }
       });
 
       it('should encrypt a stream with multiple recipients',
         async function() {
           const data = getRandomUint8();
-          const secondKaK = new KaK({id: 'urn:recipient2'});
-          const recipients = [...recipient, secondKaK.recipient];
+          const secondKak = new Kak({id: 'urn:recipient2'});
+          const recipients = [...recipient, secondKak.recipient];
           const chunks = await encryptStream({data, recipients});
           chunks.length.should.be.gte(0);
           for(const chunk of chunks) {
             chunk.jwe.should.be.a.JWE;
             chunk.jwe.recipients.length.should.equal(2);
-            isRecipient({recipients: chunk.jwe.recipients, kak: testKaK});
-            isRecipient({recipients: chunk.jwe.recipients, kak: secondKaK});
+            isRecipient({recipients: chunk.jwe.recipients, kak: testKak});
+            isRecipient({recipients: chunk.jwe.recipients, kak: secondKak});
           }
         });
 
@@ -268,16 +275,16 @@ describe('minimal-cipher', function() {
         });
         jwe.should.be.a.JWE;
         jwe.recipients.length.should.equal(1);
-        isRecipient({recipients: jwe.recipients, kak: testKaK});
-        const result = await cipher.decrypt({jwe, keyAgreementKey: testKaK});
+        isRecipient({recipients: jwe.recipients, kak: testKak});
+        const result = await cipher.decrypt({jwe, keyAgreementKey: testKak});
         result.should.eql(data);
       });
 
       it('should decrypt an Uint8Array with multiple recipients',
         async function() {
           const data = getRandomUint8();
-          const secondKaK = new KaK({id: 'urn:recipient2'});
-          const recipients = [...recipient, secondKaK.recipient];
+          const secondKak = new Kak({id: 'urn:recipient2'});
+          const recipients = [...recipient, secondKak.recipient];
           const jwe = await cipher.encrypt({
             data,
             recipients,
@@ -285,12 +292,12 @@ describe('minimal-cipher', function() {
           });
           jwe.should.be.a.JWE;
           jwe.recipients.length.should.equal(2);
-          isRecipient({recipients: jwe.recipients, kak: testKaK});
-          isRecipient({recipients: jwe.recipients, kak: secondKaK});
-          const result = await cipher.decrypt({jwe, keyAgreementKey: testKaK});
+          isRecipient({recipients: jwe.recipients, kak: testKak});
+          isRecipient({recipients: jwe.recipients, kak: secondKak});
+          const result = await cipher.decrypt({jwe, keyAgreementKey: testKak});
           result.should.eql(data);
           const result2 = await cipher.decrypt(
-            {jwe, keyAgreementKey: secondKaK});
+            {jwe, keyAgreementKey: secondKak});
           result2.should.eql(data);
         });
 
@@ -303,8 +310,8 @@ describe('minimal-cipher', function() {
         });
         jwe.should.be.a.JWE;
         jwe.recipients.length.should.equal(1);
-        isRecipient({recipients: jwe.recipients, kak: testKaK});
-        const result = await cipher.decrypt({jwe, keyAgreementKey: testKaK});
+        isRecipient({recipients: jwe.recipients, kak: testKak});
+        const result = await cipher.decrypt({jwe, keyAgreementKey: testKak});
         const resultString = new TextDecoder().decode(result);
         resultString.should.eql(data);
       });
@@ -315,28 +322,28 @@ describe('minimal-cipher', function() {
           {obj, recipients: recipient, keyResolver});
         jwe.should.be.a.JWE;
         jwe.recipients.length.should.equal(1);
-        isRecipient({recipients: jwe.recipients, kak: testKaK});
+        isRecipient({recipients: jwe.recipients, kak: testKak});
         const result = await cipher.decryptObject(
-          {jwe, keyAgreementKey: testKaK});
+          {jwe, keyAgreementKey: testKak});
         result.should.eql(obj);
       });
 
       it('should decrypt a simple object with multiple recipients',
         async function() {
           const obj = {simple: true};
-          const secondKaK = new KaK({id: 'urn:recipient2'});
-          const recipients = [...recipient, secondKaK.recipient];
+          const secondKak = new Kak({id: 'urn:recipient2'});
+          const recipients = [...recipient, secondKak.recipient];
           const jwe = await cipher.encryptObject(
             {obj, recipients, keyResolver});
           jwe.should.be.a.JWE;
           jwe.recipients.length.should.equal(2);
-          isRecipient({recipients: jwe.recipients, kak: testKaK});
-          isRecipient({recipients: jwe.recipients, kak: secondKaK});
+          isRecipient({recipients: jwe.recipients, kak: testKak});
+          isRecipient({recipients: jwe.recipients, kak: secondKak});
           const result = await cipher.decryptObject(
-            {jwe, keyAgreementKey: testKaK});
+            {jwe, keyAgreementKey: testKak});
           result.should.eql(obj);
           const result2 = await cipher.decryptObject(
-            {jwe, keyAgreementKey: secondKaK});
+            {jwe, keyAgreementKey: secondKak});
           result2.should.eql(obj);
         });
 
@@ -347,7 +354,7 @@ describe('minimal-cipher', function() {
         for(const chunk of chunks) {
           chunk.jwe.should.be.a.JWE;
           chunk.jwe.recipients.length.should.equal(1);
-          isRecipient({recipients: chunk.jwe.recipients, kak: testKaK});
+          isRecipient({recipients: chunk.jwe.recipients, kak: testKak});
         }
         const result = await decryptStream({chunks});
         result.length.should.equal(data.length);
@@ -361,7 +368,7 @@ describe('minimal-cipher', function() {
         for(const chunk of chunks) {
           chunk.jwe.should.be.a.JWE;
           chunk.jwe.recipients.length.should.equal(1);
-          isRecipient({recipients: chunk.jwe.recipients, kak: testKaK});
+          isRecipient({recipients: chunk.jwe.recipients, kak: testKak});
         }
         const result = await decryptStream({chunks});
         result.length.should.equal(data.length);
@@ -376,7 +383,7 @@ describe('minimal-cipher', function() {
         for(const chunk of chunks) {
           chunk.jwe.should.be.a.JWE;
           chunk.jwe.recipients.length.should.equal(1);
-          isRecipient({recipients: chunk.jwe.recipients, kak: testKaK});
+          isRecipient({recipients: chunk.jwe.recipients, kak: testKak});
         }
         const result = await decryptStream({chunks});
         result.length.should.equal(data.length);
@@ -386,47 +393,47 @@ describe('minimal-cipher', function() {
       it('should decrypt a stream with multiple recipients',
         async function() {
           const data = getRandomUint8({size: 100});
-          const secondKaK = new KaK({id: 'urn:recipient2'});
-          const recipients = [...recipient, secondKaK.recipient];
+          const secondKak = new Kak({id: 'urn:recipient2'});
+          const recipients = [...recipient, secondKak.recipient];
           const chunks = await encryptStream({data, chunkSize: 1, recipients});
           chunks.length.should.equal(100);
           for(const chunk of chunks) {
             chunk.jwe.should.be.a.JWE;
             chunk.jwe.recipients.length.should.equal(2);
-            isRecipient({recipients: chunk.jwe.recipients, kak: testKaK});
-            isRecipient({recipients: chunk.jwe.recipients, kak: secondKaK});
+            isRecipient({recipients: chunk.jwe.recipients, kak: testKak});
+            isRecipient({recipients: chunk.jwe.recipients, kak: secondKak});
           }
           const result = await decryptStream(
-            {chunks, keyAgreementKey: testKaK});
+            {chunks, keyAgreementKey: testKak});
           result.length.should.equal(data.length);
           result.should.deep.eql(data);
           const result2 = await decryptStream(
-            {chunks, keyAgreementKey: secondKaK});
+            {chunks, keyAgreementKey: secondKak});
           result2.length.should.equal(data.length);
           result2.should.deep.eql(data);
         });
 
-      it('should only decrypt stream if KaK matches a recipient',
+      it('should only decrypt stream if Kak matches a recipient',
         async function() {
           const data = getRandomUint8({size: 100});
-          const secondKaK = new KaK({id: 'urn:recipient2'});
-          const recipients = [...recipient, secondKaK.recipient];
+          const secondKak = new Kak({id: 'urn:recipient2'});
+          const recipients = [...recipient, secondKak.recipient];
           const chunks = await encryptStream({data, chunkSize: 1, recipients});
           chunks.length.should.equal(100);
           for(const chunk of chunks) {
             chunk.jwe.should.be.a.JWE;
             chunk.jwe.recipients.length.should.equal(2);
-            isRecipient({recipients: chunk.jwe.recipients, kak: testKaK});
-            isRecipient({recipients: chunk.jwe.recipients, kak: secondKaK});
-            // remove the testKaK
+            isRecipient({recipients: chunk.jwe.recipients, kak: testKak});
+            isRecipient({recipients: chunk.jwe.recipients, kak: secondKak});
+            // remove the testKak
             chunk.jwe.recipients = chunk.jwe.recipients.filter(
-              r => r.header.kid != testKaK.id);
+              r => r.header.kid != testKak.id);
           }
           let error = null;
           let result = null;
           try {
-            // the testKaK should fail to decrypt
-            result = await decryptStream({chunks, keyAgreementKey: testKaK});
+            // the testKak should fail to decrypt
+            result = await decryptStream({chunks, keyAgreementKey: testKak});
           } catch(e) {
             error = e;
           }
@@ -435,9 +442,9 @@ describe('minimal-cipher', function() {
           error.should.be.an('Error');
           error.message.should.equal(
             'No matching recipient found for key agreement key.');
-          // the secondKaK should still be able to decrypt
+          // the secondKak should still be able to decrypt
           result = await decryptStream(
-            {chunks, keyAgreementKey: secondKaK});
+            {chunks, keyAgreementKey: secondKak});
           result.length.should.equal(data.length);
           result.should.deep.eql(data);
         });
@@ -445,16 +452,16 @@ describe('minimal-cipher', function() {
       it('should decrypt a legacy-encrypted simple object', async function() {
         // decrypts `C20P` JWE (now replaced by `XC20P`)
         const jwe = LEGACY_JWE;
-        testKaK = new KaK({
+        testKak = new Kak({
           keyPair: LEGACY_KEY_PAIR,
           id: 'urn:123'
         });
         const obj = {simple: true};
         jwe.should.be.a.JWE;
         jwe.recipients.length.should.equal(1);
-        isRecipient({recipients: jwe.recipients, kak: testKaK});
+        isRecipient({recipients: jwe.recipients, kak: testKak});
         const result = await cipher.decryptObject(
-          {jwe, keyAgreementKey: testKaK});
+          {jwe, keyAgreementKey: testKak});
         result.should.eql(obj);
       });
       it('should encrypt and decrypt an object', async function() {
@@ -463,7 +470,7 @@ describe('minimal-cipher', function() {
           {obj, recipients: recipient, keyResolver});
         result.should.be.a.JWE;
         const decryptResult = await cipher.decryptObject({
-          jwe: result, keyAgreementKey: testKaK
+          jwe: result, keyAgreementKey: testKak
         });
         decryptResult.should.eql(obj);
       });
