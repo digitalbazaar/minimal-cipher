@@ -39,7 +39,7 @@ describe('minimal-cipher', function() {
 
       beforeEach(async function() {
         cipher = new Cipher({version: algorithm});
-        testKak = new Kak({id: 'urn:123'});
+        testKak = await Kak.generate({id: 'urn:1234'});
         recipient = [testKak.recipient];
       });
 
@@ -169,7 +169,7 @@ describe('minimal-cipher', function() {
       it('should encrypt a simple Uint8Array with multiple recipients',
         async function() {
           const data = getRandomUint8();
-          const secondKak = new Kak({id: 'urn:recipient2'});
+          const secondKak = await Kak.generate({id: 'urn:recipient2'});
           const recipients = [...recipient, secondKak.recipient];
           const result = await cipher.encrypt({
             data,
@@ -185,7 +185,7 @@ describe('minimal-cipher', function() {
       it('should fail if a recipient kid can not be resolved',
         async function() {
           const data = getRandomUint8();
-          const secondKak = new Kak({id: 'urn:recipient2'});
+          const secondKak = await Kak.generate({id: 'urn:recipient2'});
           const secondRecipient = {...secondKak.recipient};
           secondRecipient.header.kid = 'urn:not-found';
           const recipients = [...recipient, secondRecipient];
@@ -230,7 +230,7 @@ describe('minimal-cipher', function() {
       it('should encrypt a simple object with multiple recipients',
         async function() {
           const obj = {simple: true};
-          const secondKak = new Kak({id: 'urn:recipient2'});
+          const secondKak = await Kak.generate({id: 'urn:recipient2'});
           const recipients = [...recipient, secondKak.recipient];
           const result = await cipher.encryptObject(
             {obj, recipients, keyResolver});
@@ -254,7 +254,7 @@ describe('minimal-cipher', function() {
       it('should encrypt a stream with multiple recipients',
         async function() {
           const data = getRandomUint8();
-          const secondKak = new Kak({id: 'urn:recipient2'});
+          const secondKak = await Kak.generate({id: 'urn:recipient2'});
           const recipients = [...recipient, secondKak.recipient];
           const chunks = await encryptStream({data, recipients});
           chunks.length.should.be.gte(0);
@@ -283,7 +283,7 @@ describe('minimal-cipher', function() {
       it('should decrypt an Uint8Array with multiple recipients',
         async function() {
           const data = getRandomUint8();
-          const secondKak = new Kak({id: 'urn:recipient2'});
+          const secondKak = await Kak.generate({id: 'urn:recipient2'});
           const recipients = [...recipient, secondKak.recipient];
           const jwe = await cipher.encrypt({
             data,
@@ -331,7 +331,7 @@ describe('minimal-cipher', function() {
       it('should decrypt a simple object with multiple recipients',
         async function() {
           const obj = {simple: true};
-          const secondKak = new Kak({id: 'urn:recipient2'});
+          const secondKak = await Kak.generate({id: 'urn:recipient2'});
           const recipients = [...recipient, secondKak.recipient];
           const jwe = await cipher.encryptObject(
             {obj, recipients, keyResolver});
@@ -393,7 +393,7 @@ describe('minimal-cipher', function() {
       it('should decrypt a stream with multiple recipients',
         async function() {
           const data = getRandomUint8({size: 100});
-          const secondKak = new Kak({id: 'urn:recipient2'});
+          const secondKak = await Kak.generate({id: 'urn:recipient2'});
           const recipients = [...recipient, secondKak.recipient];
           const chunks = await encryptStream({data, chunkSize: 1, recipients});
           chunks.length.should.equal(100);
@@ -416,7 +416,7 @@ describe('minimal-cipher', function() {
       it('should only decrypt stream if Kak matches a recipient',
         async function() {
           const data = getRandomUint8({size: 100});
-          const secondKak = new Kak({id: 'urn:recipient2'});
+          const secondKak = await Kak.generate({id: 'urn:recipient2'});
           const recipients = [...recipient, secondKak.recipient];
           const chunks = await encryptStream({data, chunkSize: 1, recipients});
           chunks.length.should.equal(100);
@@ -452,8 +452,8 @@ describe('minimal-cipher', function() {
       it('should decrypt a legacy-encrypted simple object', async function() {
         // decrypts `C20P` JWE (now replaced by `XC20P`)
         const jwe = LEGACY_JWE;
-        testKak = new Kak({
-          keyPair: LEGACY_KEY_PAIR,
+        testKak = await Kak.generate({
+          legacyKeyPair: LEGACY_KEY_PAIR,
           id: 'urn:123'
         });
         const obj = {simple: true};
