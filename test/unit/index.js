@@ -452,7 +452,8 @@ describe('minimal-cipher', function() {
       it('should decrypt a legacy-encrypted simple object', async function() {
         // decrypts `C20P` JWE (now replaced by `XC20P`)
         const jwe = LEGACY_JWE;
-        testKak = await Kak.generate({
+        // legacy test only uses recommended KAK
+        testKak = await RecommendedKak.generate({
           legacyKeyPair: LEGACY_KEY_PAIR,
           id: 'urn:123'
         });

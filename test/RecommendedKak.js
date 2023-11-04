@@ -33,16 +33,16 @@ export class RecommendedKak {
       keyPair = nacl.box.keyPair();
     }
     const kak = new RecommendedKak({id, keyPair});
-    store.set(id, kak.export());
+    store.set(id, await kak.export());
     return kak;
   }
 
   /**
-   * Formats this KaK into an object.
+   * Formats this Kak into an object.
    *
    * @returns {object} A JSON-LD object.
    */
-  export() {
+  async export() {
     return {
       '@context': 'https://w3id.org/security/suites/x25519-2020/v1',
       id: this.id,
