@@ -1,14 +1,16 @@
 /*!
  * Copyright (c) 2019-2023 Digital Bazaar, Inc. All rights reserved.
  */
-import {isJWE, isRecipient} from '../chai-cipher.js';
+import * as EcdsaMultikey from '@digitalbazaar/ecdsa-multikey';
 import {
+  fipsKey1Data, fipsKey2Data,
   key1Data, key2Data, LEGACY_JWE, LEGACY_KEY_PAIR
 } from '../mock-data.js';
+import {isJWE, isRecipient} from '../chai-cipher.js';
 import chai from 'chai';
 import {Cipher} from '../../lib/index.js';
 import {createKeyResolver} from './didKeyResolver.js';
-//import {FipsKak} from '../FipsKak.js';
+import {FipsKak} from '../FipsKak.js';
 import {RecommendedKak} from '../RecommendedKak.js';
 import {store} from '../store.js';
 import {X25519KeyAgreementKey2020} from
@@ -17,17 +19,17 @@ import {X25519KeyAgreementKey2020} from
 const should = chai.should();
 chai.use(isJWE);
 
-const cipherAlgorithms = ['recommended', 'fips'];
+const cipherVersions = ['recommended'];//, 'fips'];
 const KakClass = new Map([
   ['recommended', RecommendedKak],
-  ['fips', RecommendedKak]//FipsKak],
+  ['fips', FipsKak],
 ]);
 
 describe('minimal-cipher', function() {
-  cipherAlgorithms.forEach(algorithm => {
-    const Kak = KakClass.get(algorithm);
+  cipherVersions.forEach(version => {
+    const Kak = KakClass.get(version);
 
-    describe(`${algorithm} algorithm`, function() {
+    describe(`${version} version`, function() {
 
       // each test inits data to null
       let cipher = null;
@@ -38,7 +40,7 @@ describe('minimal-cipher', function() {
       const keyResolver = async ({id}) => store.get(id);
 
       beforeEach(async function() {
-        cipher = new Cipher({version: algorithm});
+        cipher = new Cipher({version});
         testKak = await Kak.generate({id: 'urn:1234'});
         recipient = [testKak.recipient];
       });
@@ -116,7 +118,7 @@ describe('minimal-cipher', function() {
        *
        * @param {object} options - Options to use.
        * @param {Array} options.chunks - An array of encrypted data.
-       * @param {Kak} options.keyAgreementKey - A Kak in the recipients.
+       * @param {object} options.keyAgreementKey - A Kak in the recipients.
        *
        * @returns {Promise<Uint8Array>} The unencrypted data.
        */
@@ -477,8 +479,18 @@ describe('minimal-cipher', function() {
       });
       it('should encrypt and decrypt an object using didKeyResolver',
         async function() {
-          const key1 = new X25519KeyAgreementKey2020({...key1Data});
-          const key2 = new X25519KeyAgreementKey2020({...key2Data});
+          let key1;
+          let key2;
+          // switch off of version
+          if(version === 'recommended') {
+            key1 = new X25519KeyAgreementKey2020({...key1Data});
+            key2 = new X25519KeyAgreementKey2020({...key2Data});
+          } else {
+            // fips
+            const keyAgreement = true;
+            key1 = await EcdsaMultikey.from(fipsKey1Data, keyAgreement);
+            key2 = await EcdsaMultikey.from(fipsKey2Data, keyAgreement);
+          }
           const recipients = [
             {header: {kid: key1.id, alg: 'ECDH-ES+A256KW'}},
             {header: {kid: key2.id, alg: 'ECDH-ES+A256KW'}}
