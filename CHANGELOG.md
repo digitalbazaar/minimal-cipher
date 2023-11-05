@@ -1,6 +1,6 @@
 # minimal-cipher ChangeLog
 
-## 6.0.0 - 2023-10-dd
+## 6.0.0 - 2023-11-dd
 
 ### Changed
 - **BREAKING**: Require node >= 18.
@@ -8,6 +8,8 @@
   is often used in other libs that are combined with this one and
   it has been through a comprehensive security audit. Additional
   benefits include speed and tree-shaking capabilities.
+- Use P-256 curve elliptic keys for key agreement instead of
+  X25519 when using the fips-compliant version.
 
 ## 5.1.1 - 2022-08-14
 
