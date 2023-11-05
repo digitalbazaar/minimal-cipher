@@ -19,7 +19,7 @@ import {X25519KeyAgreementKey2020} from
 const should = chai.should();
 chai.use(isJWE);
 
-const cipherVersions = ['recommended'];//, 'fips'];
+const cipherVersions = ['recommended', 'fips'];
 const KakClass = new Map([
   ['recommended', RecommendedKak],
   ['fips', FipsKak],
@@ -451,6 +451,8 @@ describe('minimal-cipher', function() {
           result.should.deep.eql(data);
         });
 
+      // recommended-only test
+      (version === 'recommended') &&
       it('should decrypt a legacy-encrypted simple object', async function() {
         // decrypts `C20P` JWE (now replaced by `XC20P`)
         const jwe = LEGACY_JWE;
