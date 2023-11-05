@@ -1,49 +1,36 @@
 /*!
  * Copyright (c) 2019-2023 Digital Bazaar, Inc. All rights reserved.
  */
-import * as base58 from 'base58-universal';
-import {
-  deriveSecret as dhDeriveSecret,
-  multibaseDecode,
-  multibaseEncode,
-  MULTICODEC_X25519_PUB_HEADER
-} from '../lib/algorithms/x25519.js';
-import nacl from 'tweetnacl';
+import * as EcdsaMultikey from '@digitalbazaar/ecdsa-multikey';
 import {store} from './store.js';
 
 export class FipsKak {
-  constructor({keyPair, id = 'urn:123'} = {}) {
+  constructor({id, keyPair} = {}) {
     this.id = id;
     this.type = 'Multikey';
-    if(!keyPair) {
-      // use `tweetnacl` lib to cross-compare X25519 implementations
-      keyPair = nacl.box.keyPair();
-      this.privateKey = keyPair.secretKey;
-      this.publicKey = keyPair.publicKey;
-    } else {
-      this.privateKey = base58.decode(keyPair.privateKeyBase58);
-      this.publicKey = base58.decode(keyPair.publicKeyBase58);
-    }
-    this.publicKeyMultibase = multibaseEncode(
-      MULTICODEC_X25519_PUB_HEADER, this.publicKey
-    );
-
-    store.set(id, this.publicKeyNode);
+    this.privateKey = keyPair.secretKey || keyPair.privateKey;
+    this.publicKey = keyPair.publicKey;
+    this.publicKeyMultibase = keyPair.publicKeyMultibase;
+    this._keyPair = keyPair;
   }
+
+  static async generate({id = 'urn:123'} = {}) {
+    const keyPair = await EcdsaMultikey.generate(
+      {curve: 'P-256', keyAgreement: true});
+    const kak = new FipsKak({id, keyPair});
+    store.set(id, await kak.export());
+    return kak;
+  }
+
   /**
-   * Formats this KaK into an object
-   * complaint with JSON-LD-Signatures.
+   * Formats this Kak into an object.
    *
    * @returns {object} A JSON-LD object.
    */
-  get publicKeyNode() {
-    return {
-      '@context': 'https://w3id.org/security/suites/x25519-2020/v1',
-      id: this.id,
-      type: this.type,
-      publicKeyMultibase: this.publicKeyMultibase
-    };
+  async export() {
+    return this._keyPair.export({publicKey: true, includeContext: true});
   }
+
   /**
    * Formats this Kak into a partially complete JOSE Header
    * that can be used as a recipient of a JWE.
@@ -55,11 +42,8 @@ export class FipsKak {
       header: {kid: this.id, alg: 'ECDH-ES+A256KW'}
     };
   }
-  async deriveSecret({publicKey}) {
-    const remotePublicKey = multibaseDecode(
-      MULTICODEC_X25519_PUB_HEADER, publicKey.publicKeyMultibase);
 
-    const {privateKey} = this;
-    return dhDeriveSecret({privateKey, remotePublicKey});
+  async deriveSecret({publicKey}) {
+    return this._keyPair.deriveSecret({remotePublicKey: publicKey});
   }
 }
