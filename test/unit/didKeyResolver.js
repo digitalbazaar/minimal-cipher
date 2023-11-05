@@ -1,6 +1,7 @@
 /*!
  * Copyright (c) 2021-2023 Digital Bazaar, Inc. All rights reserved.
  */
+import * as EcdsaMultikey from '@digitalbazaar/ecdsa-multikey';
 import {CachedResolver} from '@digitalbazaar/did-io';
 import {driver} from '@digitalbazaar/did-method-key';
 import {Ed25519VerificationKey2020} from
@@ -13,6 +14,10 @@ const didKeyDriver = driver();
 didKeyDriver.use({
   multibaseMultikeyHeader: 'z6Mk',
   fromMultibase: Ed25519VerificationKey2020.from
+});
+didKeyDriver.use({
+  multibaseMultikeyHeader: 'zDna',
+  fromMultibase: EcdsaMultikey.from
 });
 resolver.use(didKeyDriver);
 
