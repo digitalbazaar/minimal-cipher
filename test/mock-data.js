@@ -45,3 +45,23 @@ export const key2Data = {
   publicKeyMultibase: 'z6LSjPQz1GARHBL7vnMW8XiH3UYVkgETpyk8oKhXeeFRGpQh',
   privateKeyMultibase: 'z3web9AUP49zFCBVEdQ4ksbSmzgi6JqNCA84XNxUAcMDZgZc'
 };
+
+export const fipsKey1Data = {
+  '@context': 'https://w3id.org/security/multikey/v1',
+  id: 'did:key:zDnaey9HdsvnNjAn2PaCXXJihjNsiXWzCvRS9HgEbcjPqvPNY#' +
+    'zDnaey9HdsvnNjAn2PaCXXJihjNsiXWzCvRS9HgEbcjPqvPNY',
+  type: 'Multikey',
+  controller: 'did:key:zDnaey9HdsvnNjAn2PaCXXJihjNsiXWzCvRS9HgEbcjPqvPNY',
+  publicKeyMultibase: 'zDnaey9HdsvnNjAn2PaCXXJihjNsiXWzCvRS9HgEbcjPqvPNY',
+  secretKeyMultibase: 'z42tqAhAsKYYJ3RnqzYKMzFvExVNK3NPNHgRHihqJjDAUzx6'
+};
+
+export const fipsKey2Data = {
+  '@context': 'https://w3id.org/security/multikey/v1',
+  id: 'did:key:zDnaeX3DFUeCwF6dvvXnewsLtumrDFRu8bquxi96FZ6A5dd7b#' +
+    'zDnaeX3DFUeCwF6dvvXnewsLtumrDFRu8bquxi96FZ6A5dd7b',
+  type: 'Multikey',
+  controller: 'did:key:zDnaeX3DFUeCwF6dvvXnewsLtumrDFRu8bquxi96FZ6A5dd7b',
+  publicKeyMultibase: 'zDnaeX3DFUeCwF6dvvXnewsLtumrDFRu8bquxi96FZ6A5dd7b',
+  secretKeyMultibase: 'z42tvVHmQwRcjKNBxig4kbDRuVyM2uhGxVJAgUcxtQ41YwbP'
+};
