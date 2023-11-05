@@ -23,7 +23,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@digitalbazaar/ecdsa-multikey": "^1.4.0",
+    "@digitalbazaar/ecdsa-multikey": "^1.5.0",
     "@noble/curves": "^1.2.0",
     "@stablelib/chacha": "^1.0.1",
     "@stablelib/chacha20poly1305": "^1.0.1",
