@@ -1,15 +1,15 @@
 # minimal-cipher ChangeLog
 
-## 6.0.0 - 2023-11-dd
+## 6.0.0 - 2023-11-05
 
 ### Changed
 - **BREAKING**: Require node >= 18.
-- Use `@noble/curves` to provide X25519 implementation. This lib
-  is often used in other libs that are combined with this one and
-  it has been through a comprehensive security audit. Additional
-  benefits include speed and tree-shaking capabilities.
-- Use P-256 curve elliptic keys for key agreement instead of
+- **BREAKING**: Use P-256 curve elliptic keys for key agreement instead of
   X25519 when using the fips-compliant version.
+- Use `@noble/curves` to provide X25519 implementation. This lib is often
+  used in other libs that are combined with this one and it has been
+  through a comprehensive security audit. Additional benefits include
+  speed and tree-shaking capabilities.
 
 ## 5.1.1 - 2022-08-14
 
