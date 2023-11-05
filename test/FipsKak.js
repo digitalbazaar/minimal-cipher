@@ -16,7 +16,7 @@ export class FipsKak {
 
   static async generate({id = 'urn:123'} = {}) {
     const keyPair = await EcdsaMultikey.generate(
-      {curve: 'P-256', keyAgreement: true});
+      {id, curve: 'P-256', keyAgreement: true});
     const kak = new FipsKak({id, keyPair});
     store.set(id, await kak.export());
     return kak;
