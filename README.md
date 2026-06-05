@@ -43,11 +43,22 @@ APIs, including Web KMS (TODO: citation needed).
 
 ## Install
 
-- Node.js 22+ required.
+This software requires and supports maintained recent versions of Node.js and
+browsers. Updates may remove support for older unmaintained platform versions.
+Please use dependency version lock files and testing to ensure compatibility
+with this software.
+
+To install from NPM:
+
+https://www.npmjs.com/package/@digitalbazaar/minimal-cipher
+
+```sh
+npm install @digitalbazaar/minimal-cipher
+```
 
 To install locally (for development):
 
-```
+```sh
 git clone https://github.com/digitalbazaar/minimal-cipher.git
 cd minimal-cipher
 npm install
