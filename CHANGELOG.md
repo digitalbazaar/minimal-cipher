@@ -4,6 +4,7 @@
 
 ### Changed
 - Update minor dependencies.
+- Test on Node.js 26.x.
 
 ## 6.1.0 - 2026-06-04
 
