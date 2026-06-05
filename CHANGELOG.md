@@ -1,5 +1,16 @@
 # minimal-cipher ChangeLog
 
+## 6.1.0 - 2026-06-dd
+
+### Changed
+- Update dependencies:
+  - `@digitalbazaar/ecdsa-multikey@1.8`
+  - `@noble/curves@2.2`.
+- **NOTE**: Update supported platforms.
+  - Test on Node.js >=22.
+  - Update `engines.node` to `>=22`.
+  - Update README requirements section.
+
 ## 6.0.0 - 2023-11-05
 
 ### Changed

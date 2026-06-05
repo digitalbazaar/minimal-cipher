@@ -43,9 +43,7 @@ APIs, including Web KMS (TODO: citation needed).
 
 ## Install
 
-- Node.js 14+ required.
-- [Streams API][] required. Older browsers and Node.js <18 must use a polyfill.
-- [Web Crypto API][] required. Older browsers and Node.js 14 must use a polyfill.
+- Node.js 22+ required.
 
 To install locally (for development):
 
