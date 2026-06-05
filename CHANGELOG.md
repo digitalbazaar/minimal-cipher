@@ -5,7 +5,9 @@
 ### Changed
 - Update dependencies:
   - `@digitalbazaar/ecdsa-multikey@1.8`
-  - `@noble/curves@2.2`.
+  - `@noble/curves@2.2`
+  - `@stablelib/chacha@2`,
+  - `@stablelib/chacha20poly1305@2`.
 - **NOTE**: Update supported platforms.
   - Test on Node.js >=22.
   - Update `engines.node` to `>=22`.
