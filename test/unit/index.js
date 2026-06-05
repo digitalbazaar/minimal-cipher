@@ -1,5 +1,5 @@
 /*!
- * Copyright (c) 2019-2023 Digital Bazaar, Inc. All rights reserved.
+ * Copyright (c) 2019-2026 Digital Bazaar, Inc.
  */
 import * as EcdsaMultikey from '@digitalbazaar/ecdsa-multikey';
 import {
@@ -22,7 +22,7 @@ chai.use(isJWE);
 const cipherVersions = ['recommended', 'fips'];
 const KakClass = new Map([
   ['recommended', RecommendedKak],
-  ['fips', FipsKak],
+  ['fips', FipsKak]
 ]);
 
 describe('minimal-cipher', function() {
@@ -101,13 +101,9 @@ describe('minimal-cipher', function() {
         let value;
         let done = false;
         while(!done) {
-          try {
-            ({value, done} = await reader.read());
-            if(!done) {
-              chunks.push(value);
-            }
-          } catch(e) {
-            throw e;
+          ({value, done} = await reader.read());
+          if(!done) {
+            chunks.push(value);
           }
         }
         return chunks;
@@ -137,20 +133,16 @@ describe('minimal-cipher', function() {
         let value;
         let done = false;
         while(!done) {
-          try {
-            ({value, done} = await reader.read());
-            if(!done) {
-              // create a new array with the new length
-              const next = new Uint8Array(data.length + value.length);
-              // set the first values to the existing chunk
-              next.set(data);
-              // set the chunk's values to the rest of the array
-              next.set(value, data.length);
-              // update the streamData
-              data = next;
-            }
-          } catch(e) {
-            throw e;
+          ({value, done} = await reader.read());
+          if(!done) {
+            // create a new array with the new length
+            const next = new Uint8Array(data.length + value.length);
+            // set the first values to the existing chunk
+            next.set(data);
+            // set the chunk's values to the rest of the array
+            next.set(value, data.length);
+            // update the streamData
+            data = next;
           }
         }
         return Uint8Array.from(data);

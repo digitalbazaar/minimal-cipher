@@ -21,7 +21,7 @@ module.exports = function(config) {
     client,
     singleRun: true,
     preprocessors: {
-      'unit/*.js': preprocessors,
+      'unit/*.js': preprocessors
     },
     webpack: {
       mode: 'development',
