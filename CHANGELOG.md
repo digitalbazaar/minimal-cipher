@@ -1,5 +1,10 @@
 # minimal-cipher ChangeLog
 
+## 6.1.1 - 2026-06-xx
+
+### Changed
+- Update minor dependencies.
+
 ## 6.1.0 - 2026-06-04
 
 ### Changed
